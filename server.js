@@ -28,7 +28,8 @@ app.get("/", function(req, res){
 })
 
 // Existing static routes (for CSS, images, etc.)
-app.use(static)
+app.use(express.static('public'));
+
 
 
 /* ***********************

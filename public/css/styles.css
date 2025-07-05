@@ -1,6 +1,357 @@
-/******* Change Box Model ***************/
-*,
-*:before,
-*:after {
-  box-sizing: border-box;
+/* Reset and Base Styles */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: Arial, sans-serif;
+    background-color: #f5f5f5;
+    color: #333;
+    position: relative;
+}
+
+/* Checkered Border Frame */
+body::before {
+    content: '';
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: 
+        /* Top border */
+        repeating-linear-gradient(
+            90deg,
+            #000 0px,
+            #000 20px,
+            #fff 20px,
+            #fff 40px
+        ) 0 0 / 100% 20px no-repeat,
+        /* Bottom border */
+        repeating-linear-gradient(
+            90deg,
+            #000 0px,
+            #000 20px,
+            #fff 20px,
+            #fff 40px
+        ) 0 100% / 100% 20px no-repeat,
+        /* Left border */
+        repeating-linear-gradient(
+            0deg,
+            #000 0px,
+            #000 20px,
+            #fff 20px,
+            #fff 40px
+        ) 0 0 / 20px 100% no-repeat,
+        /* Right border */
+        repeating-linear-gradient(
+            0deg,
+            #000 0px,
+            #000 20px,
+            #fff 20px,
+            #fff 40px
+        ) 100% 0 / 20px 100% no-repeat;
+    z-index: 1000;
+    pointer-events: none;
+}
+
+/* Page Layout */
+#page-layout {
+    max-width: 1200px;
+    margin: 20px auto;
+    background-color: white;
+    min-height: calc(100vh - 40px);
+    border: 3px solid #007acc;
+    position: relative;
+}
+
+/* Header */
+#page-header {
+    background-color: #e0e0e0;
+    padding: 10px 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 2px solid #ccc;
+}
+
+#logo-wrapper {
+    display: flex;
+    align-items: center;
+    text-decoration: none;
+}
+
+#logo-wrapper img {
+    width: 40px;
+    height: 40px;
+    margin-right: 10px;
+}
+
+#logo-wrapper h1 {
+    font-size: 24px;
+    font-weight: bold;
+    color: #333;
+}
+
+#page-header a {
+    text-decoration: none;
+    color: #333;
+}
+
+#account-links a {
+    color: #333;
+    text-decoration: none;
+    font-weight: bold;
+}
+
+#account-links a:hover {
+    text-decoration: underline;
+}
+
+/* Navigation */
+#main-navigation {
+    background-color: #333;
+    padding: 0;
+}
+
+#main-navigation ul {
+    list-style: none;
+    display: flex;
+    margin: 0;
+    padding: 0;
+}
+
+#main-navigation li {
+    flex: 1;
+}
+
+#main-navigation a {
+    display: block;
+    padding: 12px 20px;
+    color: white;
+    text-decoration: none;
+    text-align: center;
+    border-right: 1px solid #555;
+    transition: background-color 0.3s;
+}
+
+#main-navigation a:hover {
+    background-color: #555;
+}
+
+#main-navigation li:last-child a {
+    border-right: none;
+}
+
+/* Main Content */
+#main-content {
+    padding: 20px;
+}
+
+#main-content > h1 {
+    font-size: 28px;
+    margin-bottom: 20px;
+    color: #333;
+}
+
+/* Hero Section - The Main Focus */
+#delorean-hero {
+    position: relative;
+    background-color: #f8f8f8;
+    border: 2px solid #ddd;
+    border-radius: 10px;
+    padding: 20px;
+    margin-bottom: 30px;
+    min-height: 300px;
+    overflow: hidden;
+}
+
+#hero-text {
+    position: relative;
+    z-index: 2;
+    background-color: rgba(255, 255, 255, 0.9);
+    padding: 20px;
+    border-radius: 8px;
+    max-width: 300px;
+    margin: 20px 0;
+}
+
+#hero-text h2 {
+    color: #00bcd4;
+    font-size: 24px;
+    margin-bottom: 15px;
+    font-weight: bold;
+}
+
+#hero-text ul {
+    list-style: none;
+    margin-bottom: 20px;
+}
+
+#hero-text li {
+    margin-bottom: 8px;
+    font-size: 16px;
+    color: #666;
+}
+
+.call-to-action {
+    display: inline-block;
+    background-color: #00bcd4;
+    color: white;
+    padding: 12px 24px;
+    text-decoration: none;
+    border-radius: 5px;
+    font-weight: bold;
+    transition: background-color 0.3s;
+}
+
+.call-to-action:hover {
+    background-color: #0097a7;
+}
+
+#delorean-image {
+    position: absolute;
+    right: 20px;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 300px;
+    height: auto;
+    opacity: 0.7;
+    z-index: 1;
+}
+
+/* Additional Sections */
+#additional-sections {
+    display: flex;
+    gap: 30px;
+    margin-top: 30px;
+}
+
+#delorean-upgrades,
+#delorean-reviews {
+    flex: 1;
+}
+
+#delorean-upgrades h2,
+#delorean-reviews h2 {
+    color: #333;
+    font-size: 20px;
+    margin-bottom: 15px;
+    border-bottom: 2px solid #00bcd4;
+    padding-bottom: 5px;
+}
+
+/* Upgrade Grid */
+.upgrade-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 15px;
+}
+
+.upgrade-item {
+    text-align: center;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    padding: 10px;
+    background-color: #f9f9f9;
+    transition: transform 0.2s;
+}
+
+.upgrade-item:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+}
+
+.upgrade-image {
+    width: 80px;
+    height: 80px;
+    margin: 0 auto 10px;
+    border-radius: 5px;
+    overflow: hidden;
+    background-color: #00bcd4;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.upgrade-image img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.upgrade-item a {
+    color: #333;
+    text-decoration: none;
+    font-weight: bold;
+    font-size: 14px;
+}
+
+.upgrade-item a:hover {
+    color: #00bcd4;
+}
+
+/* Reviews Section */
+#delorean-reviews ul {
+    list-style: none;
+}
+
+#delorean-reviews li {
+    margin-bottom: 10px;
+    padding: 10px;
+    background-color: #f9f9f9;
+    border-left: 4px solid #00bcd4;
+    border-radius: 4px;
+}
+
+#delorean-reviews li:nth-child(odd) {
+    background-color: #f0f0f0;
+}
+
+/* Footer */
+footer {
+    background-color: #333;
+    color: white;
+    text-align: center;
+    padding: 15px;
+    margin-top: 40px;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    #page-layout {
+        margin: 20px 10px;
+    }
+
+    #additional-sections {
+        flex-direction: column;
+    }
+    
+    #delorean-hero {
+        min-height: 250px;
+    }
+    
+    #delorean-image {
+        width: 200px;
+        right: 10px;
+    }
+    
+    #hero-text {
+        max-width: 250px;
+    }
+    
+    .upgrade-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    #main-navigation ul {
+        flex-direction: column;
+    }
+    
+    #main-navigation a {
+        border-right: none;
+        border-bottom: 1px solid #555;
+    }
 }
