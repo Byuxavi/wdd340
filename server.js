@@ -11,11 +11,17 @@ const env = require("dotenv").config()
 const app = express()
 const static = require("./routes/static")
 
+const expressLayouts = require("express-ejs-layouts") // <-- ¡AÑADE ESTA LÍNEA!
+
 /* ***********************
  * View Engine and Templates
  *************************/
 app.set("view engine", "ejs")
 app.set("views", "./views")
+
+app.use(expressLayouts) // <-- ¡AÑADE ESTA LÍNEA para habilitar el middleware!
+app.set("layout", "./layouts/layout") // <-- ¡AÑADE ESTA LÍNEA para especificar tu layout principal!
+
 
 /* ***********************
  * Routes // <--- NEW SECTION ADDED/MODIFIED HERE
@@ -29,7 +35,6 @@ app.get("/", function(req, res){
 
 // Existing static routes (for CSS, images, etc.)
 app.use(express.static('public'));
-
 
 
 /* ***********************
