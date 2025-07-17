@@ -24,6 +24,8 @@ app.use(expressLayouts)
 app.set("layout", "./layouts/layout")
 
 
+app.use(express.static('public'));
+
 /* ***********************
  * Routes
  *************************/
@@ -33,10 +35,9 @@ app.get("/", baseController.buildHome)
 // Inventory routes
 app.use("/inv", inventoryRoute)
 
+app.get("/error/500", baseController.build500Error);
 
-// Existing static routes (for CSS, images, etc.)
-app.use(express.static('public'));
-
+app.use(errorMiddleware);
 
 /* ***********************
  * Local Server Information
@@ -45,9 +46,6 @@ app.use(express.static('public'));
 const port = process.env.PORT
 const host = process.env.HOST
 
-app.get("/error/500", baseController.build500Error);
-
-app.use(errorMiddleware);
 
 /* ***********************
  * Log statement to confirm server operation

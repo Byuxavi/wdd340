@@ -8,14 +8,23 @@ baseController.buildHome = async function(req, res){
 
 
 
+// controllers/baseController.js
+
+// ... (otras funciones como buildHome) ...
+
 /* ***************************
  * Build 500 Error Test View
  * ************************** */
 baseController.build500Error = async function(req, res, next) {
-    // Provocar un error intencionalmente (ej. dividiendo por cero, o accediendo a algo indefinido)
-    throw new Error("This is a 500 error test triggered by /error/500 route.");
-    // O:
-    // const data = undefinedValue.someProperty; // Esto también lanzaría un error
+    try {
+    
+        console.log("Attempting to trigger a 500 error..."); // Para ver en la consola si se llega aquí
+        throw new Error("This is a 500 error test triggered by /error/500 route.");
+    
+    } catch (error) {
+        
+        next(error);
+    }
 }
 
 // ... (module.exports = baseController) ...
