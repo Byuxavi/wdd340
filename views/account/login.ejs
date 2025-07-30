@@ -1,13 +1,20 @@
 <% /* A login view that displays a form to log in or link to registration */ %>
 <% /* Displays any messages from the flash middleware */ %>
 <%- messages() %>
+<% if (errors) { %>
+  <ul class="notice">
+ <% errors.array().forEach(error => { %>
+   <li><%= error.msg %></li>
+ <%  }) %>
+ </ul>
+<% } %>
 
 <div class="main-content-wrapper">
   <h1><%= title %></h1>
 
   <form action="/account/login" method="post" class="login-form">
     <label for="accountEmail">Email:</label>
-    <input type="email" id="accountEmail" name="account_email" required>
+    <input type="email" id="accountEmail" name="account_email" required value="<%= locals.account_email %>">
 
     <label for="accountPassword">Password:</label>
     <input type="password" id="accountPassword" name="account_password" required>

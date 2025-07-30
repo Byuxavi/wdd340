@@ -1,4 +1,7 @@
-const invModel = require("../models/inventory-model")
+// utilities/index.js
+
+const invModel = require("../models/inventory-model") // Asegúrate de que este import exista
+const { body, validationResult } = require("express-validator"); // Aunque no se usa directamente en este archivo, si lo tienes, déjalo. Si no, quítalo.
 const Util = {}
 
 /* ************************
@@ -33,7 +36,7 @@ Util.buildClassificationGrid = async function(data){
     grid = '<ul id="inv-display">'
     data.forEach(vehicle => {
       grid += '<li>'
-      grid +=  '<a href="../../inv/detail/'+ vehicle.inv_id
+      grid +=  '<a href="../../inv/detail/'+ vehicle.inv_id
       + '" title="View ' + vehicle.inv_make + ' '+ vehicle.inv_model
       + 'details"><img src="' + vehicle.inv_thumbnail
       +'" alt="Image of '+ vehicle.inv_make + ' ' + vehicle.inv_model
@@ -84,6 +87,28 @@ Util.buildInvDetailGrid = async function (data) {
     detailHtml += '<p class="notice">Sorry, no matching vehicle could be found.</p>'
   }
   return detailHtml
+}
+
+/* ****************************************
+ * Build the classification select list
+ * *************************************** */
+Util.buildClassificationList = async function (classification_id = null) {
+  let data = await invModel.getClassifications()
+  let classificationList =
+    '<select name="classification_id" id="classificationList" required>'
+  classificationList += "<option value=''>Choose a Classification</option>"
+  data.rows.forEach((row) => {
+    classificationList += '<option value="' + row.classification_id + '"'
+    if (
+      classification_id != null &&
+      row.classification_id == classification_id
+    ) {
+      classificationList += " selected "
+    }
+    classificationList += ">" + row.classification_name + "</option>"
+  })
+  classificationList += "</select>"
+  return classificationList
 }
 
 /* **************************************

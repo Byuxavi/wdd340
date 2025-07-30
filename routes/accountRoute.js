@@ -19,4 +19,11 @@ router.post(
   regValidate.checkRegData,     // Middleware que maneja los errores o pasa al siguiente
   utilities.handleErrors(accountController.registerAccount)
 )
+// Process the login attempt
+router.post(
+  "/login",
+  regValidate.loginRules(), // Aplica las reglas de validación de login
+  regValidate.checkLoginData, // Verifica los datos y maneja errores
+  utilities.handleErrors(accountController.accountLogin) // Esta función la crearemos en el siguiente paso
+)
 module.exports = router;

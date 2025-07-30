@@ -11,12 +11,13 @@ const env = require("dotenv").config()
 const app = express()
 const expressLayouts = require("express-ejs-layouts")
 const baseController = require("./controllers/baseController")
-const inventoryRoute = require("./routes/inventoryRoute")
+const inventoryRoute = require("./routes/inventoryRoute") // Correcto: una sola declaración
 const errorMiddleware = require("./middlewares/errors-middleware")
 const session = require("express-session")
 const pool = require('./database/')
 const accountRoute = require("./routes/accountRoute")
-const bodyParser = require("body-parser")  
+const bodyParser = require("body-parser")
+const utilities = require("./utilities/") // Para utilities.handleErrors
 
 /* ***********************
  * Middleware
@@ -35,7 +36,7 @@ app.use(session({
 // For parsing application/json
 app.use(bodyParser.json())
 // For parsing application/x-www-form-urlencoded
-app.use(bodyParser.urlencoded({ extended: true })) 
+app.use(bodyParser.urlencoded({ extended: true }))
 // Express Messages Middleware
 app.use(require('connect-flash')())
 app.use(function(req, res, next){
@@ -44,30 +45,27 @@ app.use(function(req, res, next){
 })
 
 /* ***********************
- * View Engine and Templates
- *************************/
+* View Engine and Templates
+*************************/
 app.set("view engine", "ejs")
 app.set("views", "./views")
 
 app.use(expressLayouts)
-app.set("layout", "./layouts/layout")
+app.set("layout", "layouts/layout") // <-- Mantenemos esta sin './' ni 'views/'
 
 app.use(express.static('public'));
 
-/* ***********************
- * Routes
- *************************/
-// Default route for the home page (the main website address)
-app.get("/", baseController.buildHome)
 
+// Default route for the home page (the main website address)
+app.get("/", utilities.handleErrors(baseController.buildHome))
 // Inventory routes
 app.use("/inv", inventoryRoute)
 
-// Account routes (Nuevo: Movido a la sección de rutas)
+// Account routes
 app.use("/account", accountRoute)
 
 // Route to trigger a 500 error (for testing)
-app.get("/error/500", baseController.build500Error);
+app.get("/error/500", utilities.handleErrors(baseController.build500Error));
 
 // Error handling middleware (should be last)
 app.use(errorMiddleware);

@@ -1,6 +1,7 @@
-const utilities = require(".") // Asegúrate de que el punto se refiere al directorio actual para index.js
+const utilities = require(".")
 const { body, validationResult } = require("express-validator")
 const validate = {}
+const accountModel = require("../models/account-model") // Ya lo tenías aquí, lo mantengo.
 
 /* **********************************
  * Registration Data Validation Rules
@@ -13,7 +14,7 @@ validate.registationRules = () => {
       .escape()
       .notEmpty()
       .isLength({ min: 1 })
-      .withMessage("Please provide a first name."), // on error this message is sent.
+      .withMessage("Please provide a first name."),
 
     // lastname is required and must be string
     body("account_lastname")
@@ -21,16 +22,22 @@ validate.registationRules = () => {
       .escape()
       .notEmpty()
       .isLength({ min: 2 })
-      .withMessage("Please provide a last name."), // on error this message is sent.
+      .withMessage("Please provide a last name."),
 
     // valid email is required and cannot already exist in the DB
     body("account_email")
-    .trim()
-    .escape()
-    .notEmpty()
-    .isEmail()
-    .normalizeEmail() // refer to validator.js docs
-    .withMessage("A valid email is required."),
+      .trim()
+      .escape()
+      .notEmpty()
+      .isEmail()
+      .normalizeEmail()
+      .withMessage("A valid email is required.")
+      .custom(async (account_email) => {
+        const emailExists = await accountModel.checkExistingEmail(account_email)
+        if (emailExists){
+          throw new Error("Email exists. Please log in or use different email")
+        }
+      }), // ¡Esta coma es importante para separar esta regla de la siguiente!
 
     // password is required and must be strong password
     body("account_password")
@@ -63,6 +70,44 @@ validate.checkRegData = async (req, res, next) => {
       account_firstname,
       account_lastname,
       account_email,
+    })
+    return
+  }
+  next()
+}
+
+/* **********************************
+ * Login Data Validation Rules
+ * ********************************* */
+validate.loginRules = () => {
+  return [
+    body("account_email")
+      .trim()
+      .isEmail()
+      .normalizeEmail()
+      .withMessage("A valid email is required."),
+
+    body("account_password")
+      .trim()
+      .notEmpty()
+      .withMessage("Password is required.")
+  ]
+}
+
+/* ******************************
+ * Check login data and return errors or continue to login process
+ * ***************************** */
+validate.checkLoginData = async (req, res, next) => {
+  const { account_email } = req.body // Solo necesitamos el email para stickiness
+  let errors = []
+  errors = validationResult(req)
+  if (!errors.isEmpty()) {
+    let nav = await utilities.getNav()
+    res.render("account/login", { // Renderiza la vista de login si hay errores
+      errors,
+      title: "Login",
+      nav,
+      account_email, // Envía el email para stickiness
     })
     return
   }

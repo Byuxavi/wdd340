@@ -355,3 +355,235 @@ footer {
         border-bottom: 1px solid #555;
     }
 }
+/* --- W04 Inventory Management Styles --- */
+
+/* Management Page General Styling */
+#main-content h1,
+#main-content h2 {
+    color: #333; 
+    text-align: left; 
+    margin-bottom: 15px;
+    border-bottom: 2px solid #00bcd4; 
+    padding-bottom: 5px;
+}
+
+#main-content p {
+    line-height: 1.6;
+    margin-bottom: 10px;
+}
+
+/* Links for Add Classification/Add Inventory */
+#main-content ul { 
+    list-style: none; 
+    padding: 0;
+    margin-bottom: 20px;
+}
+
+#main-content ul li {
+    margin-bottom: 10px;
+}
+
+#main-content ul li a {
+    display: inline-block; 
+    background-color: #007acc; 
+    color: white;
+    padding: 10px 15px;
+    text-decoration: none;
+    border-radius: 5px;
+    transition: background-color 0.3s ease;
+    font-weight: bold;
+}
+
+#main-content ul li a:hover {
+    background-color: #005699; 
+}
+
+/* --- Form Styles (Add Classification, Add Inventory) --- */
+form {
+    margin-top: 20px;
+    padding: 20px;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    background-color: #f9f9f9;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05); 
+}
+
+form label {
+    display: block; 
+    margin-bottom: 8px;
+    font-weight: bold;
+    color: #555; 
+}
+
+/* Regla general para inputs (sin incluir 'select') */
+form input[type="text"],
+form input[type="number"],
+form input[type="email"],
+form input[type="password"],
+form textarea { 
+    width: 100%; 
+    padding: 10px;
+    margin-bottom: 15px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    box-sizing: border-box;
+    font-size: 16px;
+}
+
+/* SOLUCIÓN AGRESIVA Y ESPECÍFICA PARA EL SELECT EN ADD NEW INVENTORY
+   Esto apunta específicamente al select con ID "classificationList" 
+   que se encuentra dentro de un formulario y, a su vez, dentro de un div con la clase ".main-content-wrapper".
+   Debería tener la máxima prioridad. */
+.main-content-wrapper form select#classificationList {
+    width: auto !important; 
+    min-width: 200px !important;
+    display: inline-block !important; /* Usamos inline-block para que se ajuste a su contenido */
+    margin-bottom: 15px !important; 
+    
+    /* Asegúrate de que estos estilos también se apliquen explícitamente y con !important */
+    padding: 8px 12px !important;
+    border-radius: 5px !important;
+    border: 1px solid #007acc !important;
+    background-color: #e6f3ff !important;
+    font-size: 16px !important;
+    cursor: pointer !important;
+}
+
+.main-content-wrapper form select#classificationList:focus {
+    outline: none !important;
+    border-color: #00bcd4 !important; 
+    box-shadow: 0 0 0 3px rgba(0, 188, 212, 0.2) !important;
+}
+
+
+/* Regla específica para el select en la página de gestión (#inventoryDisplay)
+   Esta regla debería seguir funcionando para el select en management.ejs,
+   ya que es suficientemente específica por su ID de formulario. */
+#inventoryDisplay select#classificationList {
+    margin-top: 15px; 
+    width: auto; 
+    min-width: 200px; 
+    padding: 8px 12px;
+    border-radius: 5px;
+    border: 1px solid #007acc; 
+    background-color: #e6f3ff; 
+    font-size: 16px;
+    cursor: pointer;
+}
+
+#inventoryDisplay select#classificationList:focus {
+    outline: none;
+    border-color: #00bcd4; 
+    box-shadow: 0 0 0 3px rgba(0, 188, 212, 0.2);
+}
+
+
+form input[type="submit"],
+form button[type="submit"] { 
+    background-color: #007acc; 
+    color: white;
+    padding: 12px 20px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 16px;
+    font-weight: bold;
+    transition: background-color 0.3s ease;
+    width: auto; 
+    display: block; 
+    margin-top: 20px;
+}
+
+form input[type="submit"]:hover,
+form button[type="submit"]:hover {
+    background-color: #005699;
+}
+
+/* --- Messages / Notices --- */
+.notice, .error-message { 
+    padding: 15px;
+    margin-bottom: 20px;
+    border-radius: 5px;
+    font-weight: bold;
+    text-align: center;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.notice { 
+    background-color: #d4edda; 
+    color: #155724; 
+    border: 1px solid #c3e6cb;
+}
+
+.error-message { 
+    background-color: #f8d7da; 
+    color: #721c24; 
+    border: 1px solid #f5c6cb;
+}
+
+/* --- Inventory Table (dynamic display) --- */
+#inventoryDisplayArea table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 20px;
+    background-color: #fff;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    border-radius: 8px;
+    overflow: hidden; 
+}
+
+#inventoryDisplayArea table thead th {
+    background-color: #007acc; 
+    color: white;
+    padding: 12px 15px;
+    text-align: left;
+    font-weight: bold;
+}
+
+#inventoryDisplayArea table tbody tr:nth-child(even) { 
+    background-color: #f9f9f9;
+}
+
+#inventoryDisplayArea table tbody tr:hover {
+    background-color: #e0f2f7; 
+}
+
+#inventoryDisplayArea table tbody td {
+    padding: 10px 15px;
+    border-bottom: 1px solid #eee; 
+}
+
+#inventoryDisplayArea table tbody td a {
+    color: #007acc;
+    text-decoration: none;
+    font-weight: bold;
+    transition: color 0.2s ease;
+}
+
+#inventoryDisplayArea table tbody td a:hover {
+    color: #00bcd4; 
+    text-decoration: underline;
+}
+
+
+/* --- Responsive Adjustments for new elements --- */
+@media (max-width: 768px) {
+    /* Adjust form inputs for smaller screens */
+    form input[type="text"],
+    form input[type="number"],
+    form input[type="email"],
+    form input[type="password"],
+    form textarea,
+    /* Aseguramos que los selects también tomen el 100% en móvil si es deseado */
+    form select { 
+        width: 100% !important; /* <-- ¡Con !important para asegurar en móvil! */
+    }
+
+    /* Adjust table for smaller screens - this might make it scrollable horizontally */
+    #inventoryDisplayArea {
+        overflow-x: auto; 
+    }
+    #inventoryDisplayArea table {
+        min-width: 500px; 
+    }
+}
