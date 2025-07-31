@@ -1,29 +1,63 @@
+// routes/accountRoute.js
+
 // Needed Resources
-const express = require("express")
-const router = express.Router()
-const utilities = require("../utilities/")
-const accountController = require("../controllers/accountController")
-const regValidate = require("../utilities/account-validation")
+const express = require("express");
+const router = new express.Router();
 
+const accountController = require("../controllers/accountController");
+const utilities = require("../utilities");
+const regValidate = require("../utilities/account-validation");
+
+
+/* ****************************************
+ * W05: Account Management View - Comment out for W04
+ * *************************************** */
+// router.get("/", utilities.checkLogin, utilities.handleErrors(accountController.buildAccountManagementView));
+
+/* ****************************************
+ * W04: Login Routes - Keep active for W04
+ * *************************************** */
 // Route to build login view
-router.get("/login", utilities.handleErrors(accountController.buildLogin))
-
-// Route to build registration view (¡ESTA ES LA LÍNEA FALTANTE!)
-router.get("/register", utilities.handleErrors(accountController.buildRegister))
-
-// Process the registration data
-// Process the registration data
-router.post(
-  "/register",
-  regValidate.registationRules(), // Middleware de reglas de validación
-  regValidate.checkRegData,     // Middleware que maneja los errores o pasa al siguiente
-  utilities.handleErrors(accountController.registerAccount)
-)
-// Process the login attempt
+router.get("/login", utilities.handleErrors(accountController.buildLogin));
 router.post(
   "/login",
-  regValidate.loginRules(), // Aplica las reglas de validación de login
-  regValidate.checkLoginData, // Verifica los datos y maneja errores
-  utilities.handleErrors(accountController.accountLogin) // Esta función la crearemos en el siguiente paso
-)
+  regValidate.loginRules(),
+  regValidate.checkLoginData,
+  utilities.handleErrors(accountController.accountLogin)
+);
+
+/* ****************************************
+ * W05: Logout Route - Comment out for W04
+ * *************************************** */
+// router.get("/logout", utilities.handleErrors(accountController.accountLogout));
+
+/* ****************************************
+ * W05: Registration Handlers - Comment out for W04
+ * *************************************** */
+// router.get("/registration", utilities.handleErrors(accountController.buildRegister));
+// router.post(
+//   "/register",
+//   regValidate.registrationRules(),
+//   regValidate.checkRegData,
+//   utilities.handleErrors(accountController.registerAccount)
+// );
+
+/* ****************************************
+ * W05: Update Account Handlers - Comment out for W04
+ * *************************************** */
+// router.get("/update/:accountId", utilities.handleErrors(accountController.buildUpdate));
+// router.post(
+//   "/update",
+//   regValidate.updateRules(),
+//   regValidate.checkUpdateData,
+//   utilities.handleErrors(accountController.updateAccount)
+// );
+// router.post(
+//   "/update-password",
+//   regValidate.updatePasswordRules(),
+//   regValidate.checkUpdatePasswordData,
+//   utilities.handleErrors(accountController.updatePassword)
+// );
+
+
 module.exports = router;

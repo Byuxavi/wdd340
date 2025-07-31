@@ -1,36 +1,27 @@
-<%# views/inventory/management.ejs %>
-
+<h1><%- title %></h1>
 <%- messages() %>
+<% if (errors) { %>
+    <ul class="notice">
+   <% errors.array().forEach(error => { %>
+     <li><%= error.msg %></li>
+  <%  }) %>
+   </ul>
+  <% } %>
 
-<div class="main-content-wrapper">
-  <h1><%= title %></h1>
-  <p>Welcome to the inventory management area. Please choose an option below:</p>
-
-  <h2>Inventory Management Options</h2>
-  <ul>
-    <li><a href="/inv/add-classification">Add New Classification</a></li>
-    <li><a href="/inv/add-inventory">Add New Inventory Item</a></li>
-  </ul>
-
-  <hr>
-
-  <h2>Manage Inventory</h2>
-  <p>Select a classification from the list to see the items belonging to it.</p>
-
-  <div id="classificationSelectContainer"> <%# Un simple div contenedor %>
-    <%- classificationList %> <%# Esto inserta el <select id="classificationList"> %>
-    <noscript>
-      <form method="get" action="/inv/">
-          <input type="submit" value="View Inventory">
-      </form>
-    </noscript>
-  </div>
-
-  <div id="inventoryDisplayArea">
-    <% if (locals.grid) { %>
-      <%- grid %>
-    <% } %>
-  </div>
+<ul class="no-bullet">
+    <li>
+        <a href="/inv/add-classification">Add New Classification</a>
+    </li>
+    <li>
+        <a href="/inv/add-inventory">Add New Vehicle</a>
+    </li>
+</ul>
+<h2>Manage Inventory</h2>
+<div class="input-box">
+    <p>Select a classification from the list to see the items belonging to the classification.</p>
+    <%- classificationSelect %>
+    <table id="inventoryDisplay"></table>
 </div>
 
-<script src="/js/inventory.js"></script>
+<noscript>JavaScript must be enabled to use this page.</noscript>
+<script src="../../js/inventory.js"></script>

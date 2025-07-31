@@ -1,9 +1,5 @@
-<% if (title) { %>
-    <h1><%= title %></h1>
-<% } else { %>
-    <h1>Error</h1>
-<% } %>
-
-<%# messages() %> <%# Esto es para mensajes flash si los implementas más tarde, déjalo comentado por ahora %>
-
-<p><%= message %></p>
+<div class="error-display">
+    <h2><%- title %></h2>
+    <p><%- message %></p>
+    <img src="/images/site/error.svg" alt="error">
+</div>

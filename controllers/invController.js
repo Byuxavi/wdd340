@@ -1,126 +1,162 @@
-const invModel = require("../models/inventory-model")
-const utilities = require("../utilities/")
-const invValidate = require("../utilities/inventory-validation") // Asegúrate de que esté aquí
+// controllers/invController.js
 
-const invCont = {}
+const invModel = require("../models/inventory-model");
+const utilities = require("../utilities/");
 
-/* ***************************
+const invCont = {};
+
+/* *******************************************************************
+ * WEEK 2 / WEEK 3: Inventory Display Functions
+ ******************************************************************* */
+
+/**
  * Build inventory by classification view
- * ***************************/
+ * @param {import('express').Request} req
+ * @param {import('express').Response} res
+ * @param {import('express').NextFunction} next
+ */
 invCont.buildByClassificationId = async function (req, res, next) {
-  const classification_id = req.params.classificationId
-  const data = await invModel.getInventoryByClassificationId(classification_id)
-  const grid = await utilities.buildClassificationGrid(data)
-  let nav = await utilities.getNav()
-  const className = data[0].classification_name
-  res.render("./inventory/classification", {
+  const classification_id = req.params.classificationId;
+  /** @type {Array} */
+  const data = await invModel.getInventoryByClassificationId(classification_id);
+
+  let grid;
+  let className;
+  if (data.length) {
+    grid = await utilities.buildClassificationGrid(data);
+    className = data[0].classification_name;
+  } else {
+    grid = "";
+    className = "No";
+  }
+  let nav = await utilities.getNav();
+
+  res.render("inventory/classification", {
     title: className + " vehicles",
     nav,
     grid,
-  })
-}
+  });
+};
 
-/* ***************************
- * Build management view
- * ***************************/
-invCont.buildManagement = async function (req, res, next) {
-  let nav = await utilities.getNav()
-  const classificationList = await utilities.buildClassificationList() // Obtiene la lista completa de clasificaciones
+/**
+ * Build the view to display a single vehicle (Vehicle Detail View)
+ * This is mentioned in W04 rubric's Frontend Checklist (Criteria 1).
+ * @param {import('express').Request} req
+ * @param {import('express').Response} res
+ * @param {import('express').NextFunction} next
+ */
+invCont.buildByInventoryId = async function (req, res, next) {
+  const inventoryId = req.params.inventoryId;
+  const data = await invModel.getInventoryByInventoryId(inventoryId);
+  const listing = await utilities.buildItemListing(data[0]);
+  let nav = await utilities.getNav();
+  const itemName = `${data[0].inv_make} ${data[0].inv_model}`;
 
-  let grid = null; // Inicializa grid a null
-
-  // Si hay un classification_id en la query string, obtener y construir la cuadrícula
-  const classification_id = parseInt(req.query.classificationId); // Convertir a número
-
-  if (!isNaN(classification_id) && classification_id > 0) { // Asegúrate de que es un número válido
-    const data = await invModel.getInventoryByClassificationId(classification_id);
-    if (data && data.length > 0) {
-      grid = await utilities.buildClassificationGrid(data);
-    } else {
-      // Si no se encontraron vehículos para la clasificación seleccionada
-      grid = '<p class="notice">Sorry, no matching vehicles could be found for this classification.</p>';
-    }
-  }
-
-  res.render("inventory/management", {
-    title: "Inventory Management",
+  res.render("inventory/listing", {
+    title: itemName,
     nav,
-    errors: null,
-    classificationList, // Pasa la lista a la vista
-    grid, // Pasa la cuadrícula (será null si no se seleccionó una clasificación o no hay datos)
-  })
-}
+    listing,
+  });
+};
 
+/* *******************************************************************
+ * WEEK 4: Inventory Management and Addition (Classifications & Vehicles)
+ ******************************************************************* */
+
+/**
+ * Build the main vehicle management view (W04)
+ * @param {import('express').Request} req
+ * @param {import('express').Response} res
+ * @param {import('express').NextFunction} next
+ */
+invCont.buildManagementView = async function (req, res, next) {
+  let nav = await utilities.getNav();
+  const classificationSelect = await utilities.buildClassificationList();
+  res.render("inventory/management", {
+    title: "Vehicle Management",
+    errors: null,
+    nav,
+    classificationSelect,
+  });
+};
+
+/**
+ * Build the add classification view (W04)
+ * @param {import('express').Request} req
+ * @param {import('express').Response} res
+ * @param {import('express').NextFunction} next
+ */
 invCont.buildAddClassification = async function (req, res, next) {
-  let nav = await utilities.getNav()
-  res.render("inventory/add-classification", {
+  let nav = await utilities.getNav();
+
+  res.render("inventory/addClassification", {
     title: "Add New Classification",
     nav,
     errors: null,
-    // No necesitamos classificationList para este formulario GET inicial,
-    // solo si se re-renderiza por un error de validación con sticky forms.
-  })
-}
+  });
+};
 
-/* ***************************
- * Build add new inventory view
- * ***************************/
-invCont.buildAddInventory = async function (req, res, next) {
-  let nav = await utilities.getNav()
-  let classificationList = await utilities.buildClassificationList() // Obtiene la lista dinámica
-  res.render("inventory/add-inventory", {
-    title: "Add New Inventory",
-    nav,
-    classificationList, // Pasa la lista a la vista
-    errors: null,
-  })
-}
+/**
+ * Handle post request to add a vehicle classification (W04)
+ * @param {import('express').Request} req
+ * @param {import('express').Response} res
+ * @param {import('express').NextFunction} next
+ */
+invCont.addClassification = async function (req, res, next) {
+  const { classification_name } = req.body;
 
-/* ***************************
- * Process Add New Classification
- * ***************************/
-invCont.addClassification = async function (req, res) {
-  const { classification_name } = req.body
-
-  // Nota: La validación de express-validator se manejará ANTES de esta función
-  // en la cadena de middleware de la ruta. Por eso 'errors' aquí es 'null'
-  // o se manejará en invValidate.checkClassificationData
-
-  const classResult = await invModel.addClassification(classification_name)
-
-  if (classResult) {
+  const response = await invModel.addClassification(classification_name);
+  let nav = await utilities.getNav();
+  if (response) {
     req.flash(
       "notice",
-      `The ${classification_name} classification was successfully added.`
-    )
-    // *** CORRECCIÓN CLAVE: Redirigir a la página de gestión si es exitoso. ***
-    // Esto asegura que `buildManagement` se ejecute y pase `classificationList`.
-    res.status(201).redirect("/inv/")
-  } else {
-    req.flash("notice", "Sorry, adding the new classification failed.")
-    let nav = await utilities.getNav()
-    // Si falla la inserción en la DB, re-renderiza el formulario de añadir clasificación.
-    // También necesitamos la lista de clasificaciones si el formulario de añadir inventario la usa,
-    // pero para add-classification.ejs en sí, no es estrictamente necesaria a menos que la plantilla lo pida.
-    // Aunque no la use, para evitar futuros errores, la podemos pasar.
-    const classificationList = await utilities.buildClassificationList() // Asegura que la lista esté disponible si el template la necesita.
-
-    res.status(501).render("inventory/add-classification", {
-      title: "Add New Classification",
+      `The "${classification_name}" classification was successfully added.`
+    );
+    const classificationSelect = await utilities.buildClassificationList(); // Rebuild for management view
+    res.render("inventory/management", {
+      title: "Vehicle Management",
+      errors: null,
       nav,
-      errors: null, // Asumiendo que `checkClassificationData` manejará los errores de validación.
-      classificationList, // Asegurarse de que esté disponible si el EJS lo espera
-      locals: {
-        classification_name: classification_name // Para sticky forms
-      }
-    })
+      classificationSelect,
+    });
+  } else {
+    req.flash("notice", `Failed to add ${classification_name}`);
+    res.render("inventory/addClassification", {
+      title: "Add New Classification",
+      errors: null,
+      nav,
+      classification_name,
+    });
   }
-}
+};
 
-/* ***************************
- * Process add new inventory
- * ***************************/
-invCont.addInventory = async function (req, res) {
+/**
+ * Build the add inventory view (W04)
+ * @param {import('express').Request} req
+ * @param {import('express').Response} res
+ * @param {import('express').NextFunction} next
+ */
+invCont.buildAddInventory = async function (req, res, next) {
+  const nav = await utilities.getNav();
+  let classifications = await utilities.buildClassificationList();
+
+  res.render("inventory/addInventory", {
+    title: "Add Vehicle",
+    errors: null,
+    nav,
+    classifications,
+  });
+};
+
+/**
+ * Handle post request to add a vehicle to the inventory (W04)
+ * @param {import('express').Request} req
+ * @param {import('express').Response} res
+ * @param {import('express').NextFunction} next
+ */
+invCont.addInventory = async function (req, res, next) {
+  const nav = await utilities.getNav();
+
   const {
     inv_make,
     inv_model,
@@ -131,10 +167,10 @@ invCont.addInventory = async function (req, res) {
     inv_price,
     inv_miles,
     inv_color,
-    classification_id
-  } = req.body
+    classification_id,
+  } = req.body;
 
-  const invResult = await invModel.addInventory(
+  const response = await invModel.addInventory(
     inv_make,
     inv_model,
     inv_year,
@@ -145,55 +181,217 @@ invCont.addInventory = async function (req, res) {
     inv_miles,
     inv_color,
     classification_id
-  )
+  );
 
-  if (invResult) {
+  if (response) {
     req.flash(
       "notice",
-      `The ${inv_make} ${inv_model} was successfully added.`
-    )
-    // Redirige de nuevo a la vista de gestión
-    res.status(201).redirect("/inv/") // Redirección HTTP para POST
-  } else {
-    req.flash("notice", "Sorry, adding the new inventory failed.")
-    // Renderiza la vista de añadir inventario de nuevo si falla
-    let nav = await utilities.getNav()
-    // *** CORRECCIÓN: Pasa el classification_id como número a buildClassificationList para que seleccione la opción correcta. ***
-    let classificationList = await utilities.buildClassificationList(Number(classification_id))
-    res.status(501).render("inventory/add-inventory", {
-      title: "Add New Inventory",
+      `The ${inv_year} ${inv_make} ${inv_model} successfully added.`
+    );
+    const classificationSelect = await utilities.buildClassificationList(classification_id);
+    res.render("inventory/management", {
+      title: "Vehicle Management",
       nav,
-      classificationList,
-      errors: null, // No hay errores de validación aquí, solo un fallo de DB
-      locals: { // Mantén la stickiness
-        inv_make,
-        inv_model,
-        inv_year,
-        inv_description,
-        inv_image,
-        inv_thumbnail,
-        inv_price,
-        inv_miles,
-        inv_color,
-        classification_id // Asegúrate de que este también se pase a locals si es necesario para el sticky select
-      }
-    })
+      classificationSelect,
+      errors: null,
+    });
+  } else {
+    req.flash("notice", "Sorry, there was a problem.");
+    let classifications = await utilities.buildClassificationList(classification_id);
+    res.render("inventory/addInventory", {
+      title: "Add Vehicle",
+      nav,
+      errors: null,
+      classifications,
+      inv_make, inv_model, inv_year, inv_description, inv_image, inv_thumbnail, inv_price, inv_miles, inv_color, classification_id
+    });
   }
-}
+};
 
 /* ***************************
- * Return Inventory by Classification As JSON
- * ***************************/
+ * WEEK 4 (or earlier): Return Inventory by Classification As JSON
+ * This is used for dynamic updates on the management page.
+ * ************************** */
 invCont.getInventoryJSON = async (req, res, next) => {
-  const classification_id = parseInt(req.params.classificationId)
-  const invData = await invModel.getInventoryByClassificationId(classification_id)
-  if (invData[0] && invData[0].inv_id) { // *** CORRECCIÓN: Verifica si invData[0] existe antes de acceder a .inv_id ***
-    return res.json(invData)
+  const classification_id = parseInt(req.params.classification_id);
+  const invData = await invModel.getInventoryByClassificationId(
+    classification_id
+  );
+  if (invData[0] && invData[0].inv_id) {
+    return res.json(invData);
   } else {
-    // CORRECCIÓN: Si no hay datos, envia una respuesta 404 o un array vacío para el fetch
-    // next(new Error("No Data Returned")) // Esto causaría un 500. Mejor enviar un JSON vacío o 404.
-    return res.status(404).json({ message: "No Data Returned for this classification." });
+    next(new Error("No data returned"));
   }
-}
+};
 
-module.exports = invCont
+/* *******************************************************************
+ * WEEK 6: Inventory Update and Deletion
+ ******************************************************************* */
+/*
+// /**
+//  * Build the edit inventory view (W06)
+//  * @param {import('express').Request} req
+//  * @param {import('express').Response} res
+//  * @param {import('express').NextFunction} next
+//  */
+// invCont.buildEditInventory = async function (req, res, next) {
+//   const inventory_id = parseInt(req.params.inventoryId);
+//   const nav = await utilities.getNav();
+
+//   const inventoryData = (
+//     await invModel.getInventoryByInventoryId(inventory_id))[0];
+//   const name = `${inventoryData.inv_make} ${inventoryData.inv_model}`;
+
+//   let classifications = await utilities.buildClassificationList(inventoryData.classification_id);
+
+//   res.render("inventory/editInventory", {
+//     title: "Edit " + name,
+//     errors: null,
+//     nav,
+//     classifications,
+//     inv_id: inventoryData.inv_id,
+//     inv_make: inventoryData.inv_make,
+//     inv_model: inventoryData.inv_model,
+//     inv_year: inventoryData.inv_year,
+//     inv_description: inventoryData.inv_description,
+//     inv_image: inventoryData.inv_image,
+//     inv_thumbnail: inventoryData.inv_thumbnail,
+//     inv_price: inventoryData.inv_price,
+//     inv_miles: inventoryData.inv_miles,
+//     inv_color: inventoryData.inv_color,
+//     classification_id: inventoryData.classification_id,
+//   });
+// };
+
+// /**
+//  * Handle post request to update a vehicle to the inventory (W06)
+//  * @param {import('express').Request} req
+//  * @param {import('express').Response} res
+//  * @param {import('express').NextFunction} next
+//  */
+// invCont.updateInventory = async function (req, res, next) {
+//   const nav = await utilities.getNav();
+
+//   const {
+//     inv_id,
+//     inv_make,
+//     inv_model,
+//     inv_year,
+//     inv_description,
+//     inv_image,
+//     inv_thumbnail,
+//     inv_price,
+//     inv_miles,
+//     inv_color,
+//     classification_id,
+//   } = req.body;
+
+//   const response = await invModel.updateInventory(
+//     inv_id,
+//     inv_make,
+//     inv_model,
+//     inv_year,
+//     inv_description,
+//     inv_image,
+//     inv_thumbnail,
+//     inv_price,
+//     inv_miles,
+//     inv_color,
+//     classification_id
+//   );
+
+//   if (response) {
+//     const itemName = response.inv_make + " " + response.inv_model;
+//     req.flash("notice", `The ${itemName} was successfully updated.`);
+//     res.redirect("/inv/");
+//   } else {
+//     const classifications = await utilities.buildClassificationList(
+//       classification_id
+//     );
+//     const itemName = `${inv_make} ${inv_model}`;
+//     req.flash("notice", "Sorry, the update failed.");
+//     res.status(501).render("inventory/editInventory", {
+//       title: "Edit " + itemName,
+//       nav,
+//       errors: null,
+//       classifications,
+//       inv_id,
+//       inv_make,
+//       inv_model,
+//       inv_year,
+//       inv_description,
+//       inv_image,
+//       inv_thumbnail,
+//       inv_price,
+//       inv_miles,
+//       inv_color,
+//       classification_id,
+//     });
+//   }
+// };
+
+// /**
+//  * Build the delete inventory view (W06)
+//  * @param {import('express').Request} req
+//  * @param {import('express').Response} res
+//  * @param {import('express').NextFunction} next
+//  */
+// invCont.buildDeleteInventory = async function (req, res, next) {
+//   const inventory_id = parseInt(req.params.inventoryId);
+//   const nav = await utilities.getNav();
+
+//   const inventoryData = (
+//     await invModel.getInventoryByInventoryId(inventory_id))[0];
+//   const name = `${inventoryData.inv_make} ${inventoryData.inv_model}`;
+
+//   res.render("inventory/delete-confirm", {
+//     title: "Delete " + name,
+//     errors: null,
+//     nav,
+//     inv_id: inventoryData.inv_id,
+//     inv_make: inventoryData.inv_make,
+//     inv_model: inventoryData.inv_model,
+//     inv_year: inventoryData.inv_year,
+//     inv_price: inventoryData.inv_price,
+//   });
+// };
+
+// /**
+//  * Handle post request to delete a vehicle from the inventory (W06)
+//  * @param {import('express').Request} req
+//  * @param {import('express').Response} res
+//  * @param {import('express').NextFunction} next
+//  */
+// invCont.deleteInventory = async function (req, res, next) {
+//   const nav = await utilities.getNav();
+//   const inventory_id = parseInt(req.body.inv_id);
+//   const {
+//     inv_id,
+//     inv_make,
+//     inv_model,
+//     inv_year,
+//     inv_price,
+//   } = req.body;
+
+//   const queryResponse = await invModel.deleteInventory(inventory_id);
+//   const itemName = `${inv_make} ${inv_model}`;
+
+//   if (queryResponse) {
+//     req.flash("notice", `The ${itemName} was successfully deleted.`);
+//     res.redirect("/inv/");
+//   } else {
+//     req.flash("notice", "Sorry, the delete failed.");
+//     res.status(501).render("inventory/delete-confirm", { // Changed to delete-confirm as it's the view for delete
+//       title: "Delete " + itemName,
+//       nav,
+//       errors: null,
+//       inv_id,
+//       inv_make,
+//       inv_model,
+//       inv_year,
+//       inv_price,
+//     });
+//   }
+// };
+
+module.exports = invCont; 

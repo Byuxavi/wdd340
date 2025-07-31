@@ -1,58 +1,55 @@
-<h1><%= title %></h1>
+<h1>Welcome to CSE Motors</h1>
 <%- messages() %>
-
-<div id="delorean-hero">
-    <div id="hero-text">
-        <h2>DMC Delorean</h2>
+<section class="hero">
+    <img src="/images/vehicles/delorean.jpg" alt="car">
+    <div class="hero-text">
+        <h3>DMC Delorean</h3>
         <ul>
             <li>3 Cup holders</li>
             <li>Superman doors</li>
             <li>Fuzzy dice!</li>
         </ul>
-        <a href="/build" title="Own Today" class="call-to-action">Own Today</a>
+        <input type="button" class="button-blue" value="Own Today">
     </div>
-    <img src="/images/vehicles/delorean.jpg" alt="DMC Delorean" id="delorean-image">
-</div>
-
-<div id="additional-sections">
-    <section id="delorean-upgrades">
-        <h2>Delorean Upgrades</h2>
-        <div class="upgrade-grid">
-            <div class="upgrade-item">
-                <div class="upgrade-image">
-                    <img src="/images/upgrades/flux-cap.png" alt="Flux Capacitor">
-                </div>
-                <a href="#" title="Flux Capacitor">Flux Capacitor</a>
-            </div>
-            <div class="upgrade-item">
-                <div class="upgrade-image">
-                    <img src="/images/upgrades/flame.jpg" alt="Flame Decals">
-                </div>
-                <a href="#" title="Flame Decals">Flame Decals</a>
-            </div>
-            <div class="upgrade-item">
-                <div class="upgrade-image">
-                    <img src="/images/upgrades/bumper_sticker.jpg" alt="Bumper Stickers">
-                </div>
-                <a href="#" title="Bumper Stickers">Bumper Stickers</a>
-            </div>
-            <div class="upgrade-item">
-                <div class="upgrade-image">
-                    <img src="/images/upgrades/hub-cap.jpg" alt="Hub Caps">
-                </div>
-                <a href="#" title="Hub Caps">Hub Caps</a>
-            </div>
-        </div>
-    </section>
-
-    <section id="delorean-reviews">
+</section>
+<div class="content">
+    <section id="reviews">
         <h2>DMC Delorean Reviews</h2>
-        <ul>
+        <ul class="open">
             <li>"So fast it's almost like traveling in time." (4/5)</li>
             <li>"Coolest ride on the road." (4/5)</li>
             <li>"I'm feeling McFly!" (5/5)</li>
-            <li>"The most futuristic ride of our day." (4/5)</li>
-            <li>"'80s livin and I love it!" (5/5)</li>
+            <li>"The most futuristic ride of our day." (4.5/5)</li>
+            <li>"80's livin and I love it." (5/5)</li>
         </ul>
+    </section>
+    <section id="upgrades">
+        <h2>Delorean Upgrades</h2>
+        <div class="gallery">
+            <div class="caption-image">
+                <div>
+                    <img src="/images/upgrades/flux-cap.png" alt="Flux capacitor">
+                </div>
+                <p><a href="#">Flux Capacitor</a></p>
+            </div>
+            <div class="caption-image">
+                <div>
+                    <img src="/images/upgrades/flame.jpg" alt="Flame decal">
+                </div>
+                <p><a href="#">Flame Decals</a></p>
+            </div>
+            <div class="caption-image">
+                <div>
+                    <img src="/images/upgrades/bumper_sticker.jpg" alt="Hello world bumper sticker">
+                </div>
+                <p><a href="#">Bumper Stickers</a></p>
+            </div>
+            <div class="caption-image">
+                <div>
+                    <img src="/images/upgrades/hub-cap.jpg" alt="Hub cap">
+                </div>
+                <p><a href="#">Hub Caps</a></p>
+            </div>
+        </div>
     </section>
 </div>

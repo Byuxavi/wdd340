@@ -6,80 +6,118 @@
 /* ***********************
  * Require Statements
  *************************/
-const express = require("express")
-const env = require("dotenv").config()
-const app = express()
-const expressLayouts = require("express-ejs-layouts")
-const baseController = require("./controllers/baseController")
-const inventoryRoute = require("./routes/inventoryRoute") // Correcto: una sola declaración
-const errorMiddleware = require("./middlewares/errors-middleware")
-const session = require("express-session")
-const pool = require('./database/')
-const accountRoute = require("./routes/accountRoute")
-const bodyParser = require("body-parser")
-const utilities = require("./utilities/") // Para utilities.handleErrors
+// Their stuff
+const express = require("express");
+const expressLayouts = require("express-ejs-layouts");
+const session = require("express-session");
+const bodyParser = require("body-parser");
+const cookieParser = require("cookie-parser");
+
+// My stuff
+const static = require("./routes/static");
+const baseController = require("./controllers/baseController");
+const inventoryRoute = require("./routes/inventoryRoute.js");
+
+// W05: Account routes - Commented out for W04
+// const accountRoute = require('./routes/accountRoute.js');
+
+// W06/W07: Message routes - Commented out for W04
+// const messageRoute = require('./routes/messageRoute.js');
+
+const intentionalErrorRoute = require("./routes/intentionalErrorRoute.js");
+const utilities = require("./utilities/index.js");
+const pool = require("./database"); // This is used by connect-pg-simple
+
+// Init
+const app = express();
+const env = require("dotenv").config();
+
 
 /* ***********************
  * Middleware
  * ************************/
-app.use(session({
-  store: new (require('connect-pg-simple')(session))({
-    createTableIfMissing: true,
-    pool,
-  }),
-  secret: process.env.SESSION_SECRET,
-  resave: true,
-  saveUninitialized: true,
-  name: 'sessionId',
-}))
-
-// For parsing application/json
-app.use(bodyParser.json())
-// For parsing application/x-www-form-urlencoded
-app.use(bodyParser.urlencoded({ extended: true }))
+app.use(
+  session({
+    store: new (require("connect-pg-simple")(session))({
+      createTableIfMissing: true,
+      pool,
+    }),
+    secret: process.env.SESSION_SECRET,
+    resave: true,
+    saveUninitialized: true,
+    name: "sessionId",
+  })
+);
 // Express Messages Middleware
-app.use(require('connect-flash')())
-app.use(function(req, res, next){
-  res.locals.messages = require('express-messages')(req, res)
-  next()
+app.use(require("connect-flash")());
+app.use(function (req, res, next) {
+  res.locals.messages = require("express-messages")(req, res);
+  next();
+});
+app.use(bodyParser.json());
+app.use(bodyParser.urlencoded({ // for parsing application/x-www-form-urlencoded
+  extended: true
+}));
+// Cookie parser
+app.use(cookieParser())
+// JWT checker
+app.use(utilities.checkJWTToken);
+
+/* ***********************
+ * View Engine and Templates
+ *************************/
+app.set("view engine", "ejs");
+app.use(expressLayouts);
+app.set("layout", "./layouts/layout"); // Not at view root
+
+/* ***********************
+ * Routes
+ *************************/
+app.use(static);
+// Index route
+app.get("/", utilities.handleErrors(baseController.buildHome));
+// Inventory routes
+app.use("/inv", inventoryRoute);
+
+// W05: Account routes - Commented out for W04
+// app.use("/account", accountRoute);
+
+// W06/W07: Message routes - Commented out for W04
+// app.use("/message", messageRoute);
+
+// Intentional error route. Used for testing
+app.use("/ierror", intentionalErrorRoute);
+// File Not Found Route - must be last route in list
+app.use(async (req, res, next) => {
+  next({status: 404, message: 'Unfortunately, we don\'t have that page in stock.'})
 })
 
 /* ***********************
-* View Engine and Templates
+* Express Error Handler
+* Place after all other middleware
 *************************/
-app.set("view engine", "ejs")
-app.set("views", "./views")
-
-app.use(expressLayouts)
-app.set("layout", "layouts/layout") // <-- Mantenemos esta sin './' ni 'views/'
-
-app.use(express.static('public'));
-
-
-// Default route for the home page (the main website address)
-app.get("/", utilities.handleErrors(baseController.buildHome))
-// Inventory routes
-app.use("/inv", inventoryRoute)
-
-// Account routes
-app.use("/account", accountRoute)
-
-// Route to trigger a 500 error (for testing)
-app.get("/error/500", utilities.handleErrors(baseController.build500Error));
-
-// Error handling middleware (should be last)
-app.use(errorMiddleware);
+app.use(async (err, req, res, next) => {
+  let nav = await utilities.getNav()
+  console.error(`Error at: "${req.originalUrl}": ${err.message}`)
+  console.dir(err);
+  if(err.status == 404){ message = err.message} else {message = 'Oh no! There was a crash. Maybe try a different route?'}
+  res.render("errors/error", {
+    title: err.status || 'Server Error',
+    message,
+    nav
+  })
+})
 
 /* ***********************
  * Local Server Information
  * Values from .env (environment) file
  *************************/
-const port = process.env.PORT
-const host = process.env.HOST
+const port = process.env.PORT;
+const host = process.env.HOST;
 
 /* ***********************
  * Log statement to confirm server operation
  *************************/
 app.listen(port, () => {
-  console.log(`app listening on ${host}:${port}`)
-})
+  console.log(`app listening on ${host}:${port}`);
+});

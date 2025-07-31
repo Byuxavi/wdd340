@@ -1,40 +1,73 @@
 // routes/inventoryRoute.js
 
-const express = require("express")
-const router = new express.Router()
-const invController = require("../controllers/invController")
-const utilities = require("../utilities/") // Asegúrate de importar utilities
-const invValidate = require("../utilities/inventory-validation") // Importa tu validador
+// Needed Resources
+const express = require("express");
+const router = new express.Router();
+const invController = require("../controllers/invController");
+const utilities = require("../utilities");
+const invValidate = require("../utilities/inventory-validation");
 
-// Ruta para la vista de gestión de inventario
-router.get("/", utilities.handleErrors(invController.buildManagement))
+/* *******************************************************************
+ * WEEK 5: Authentication / Authorization Middleware - Comment out for W04
+ ******************************************************************* */
+// router.use(["/add-classification", "/add-inventory", "/edit/:inventoryId", "/update", "/delete/:inventoryId", "/delete/",], utilities.checkLogin);
+// router.use(["/add-classification", "/add-inventory", "/edit/:inventoryId", "/update", "/delete/:inventoryId", "/delete/",], utilities.checkAuthorizationManager);
 
-// Ruta para la vista de añadir nueva clasificación
-router.get("/add-classification", utilities.handleErrors(invController.buildAddClassification))
+/* *******************************************************************
+ * WEEK 2 / WEEK 3: Inventory Display Routes - Keep active for W04
+ ******************************************************************* */
 
-// Ruta para procesar la nueva clasificación
+// Route to build inventory by classification view
+router.get("/type/:classificationId", utilities.handleErrors(invController.buildByClassificationId));
+
+// Route to get detail view
+router.get("/detail/:inventoryId", utilities.handleErrors(invController.buildByInventoryId));
+
+/* *******************************************************************
+ * WEEK 4: Inventory Management and Addition Routes - Keep active for W04
+ ******************************************************************* */
+
+// Route to build main inventory management view
+router.get("/", utilities.handleErrors(invController.buildManagementView));
+
+// Classification management routes
+router.get("/add-classification", utilities.handleErrors(invController.buildAddClassification));
 router.post(
   "/add-classification",
-  invValidate.classificationRules(), // <-- ¡CORREGIDO: Añade las reglas de validación!
-  invValidate.checkClassificationData, // <-- ¡CORREGIDO: Añade el middleware de chequeo!
+  invValidate.classificationRules(),
+  invValidate.checkClassificationData,
   utilities.handleErrors(invController.addClassification)
-)
+);
 
-// Ruta para la vista de añadir nuevo inventario (vehículo)
-router.get("/add-inventory", utilities.handleErrors(invController.buildAddInventory))
-
-// Ruta para procesar el nuevo inventario (vehículo)
+// Inventory management routes
+router.get("/add-inventory", utilities.handleErrors(invController.buildAddInventory));
 router.post(
   "/add-inventory",
-  invValidate.inventoryRules(), // <-- ¡CORREGIDO: Añade las reglas de validación!
-  invValidate.checkInventoryData, // <-- ¡CORREGIDO: Añade el middleware de chequeo!
+  invValidate.inventoryRules(),
+  invValidate.checkInventoryData,
   utilities.handleErrors(invController.addInventory)
-)
+);
 
-// Ruta para obtener inventario por clasificación como JSON (para el AJAX)
-router.get(
-  "/getInventory/:classificationId",
-  utilities.handleErrors(invController.getInventoryJSON)
-)
+// AJAX inventory API call route
+router.get("/getInventory/:classification_id", utilities.handleErrors(invController.getInventoryJSON));
 
-module.exports = router
+
+/* *******************************************************************
+ * WEEK 6: Inventory Update and Deletion Routes 
+ ******************************************************************* */
+/*
+// Build edit/update inventory views
+router.get("/edit/:inventoryId", utilities.handleErrors(invController.buildEditInventory));
+router.post(
+  "/update/",
+  invValidate.inventoryRules(),
+  invValidate.checkUpdateData,
+  utilities.handleErrors(invController.updateInventory)
+);
+
+// Delete vehicle information routes
+router.get("/delete/:inventoryId", utilities.handleErrors(invController.buildDeleteInventory));
+router.post("/delete/", utilities.handleErrors(invController.deleteInventory));
+*/ // End of W06 block
+
+module.exports = router;

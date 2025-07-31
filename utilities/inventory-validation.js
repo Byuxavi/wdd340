@@ -1,148 +1,227 @@
-/// utilities/inventory-validation.js
+// utilities/inventory-validation.js
 
-const { body, validationResult } = require("express-validator")
-const validate = {} // Objeto para contener los middlewares de validación
-
-// Necesitamos importar el modelo de inventario para la validación de duplicados
-const invModel = require("../models/inventory-model")
-// Necesitamos importar utilities para acceder a funciones como getNav y buildClassificationList
-const utilities = require(".") // Esto importa el archivo index.js de la carpeta utilities
+const utilities = require("../utilities");
+const invModel = require("../models/inventory-model"); // This import remains
+const { body, validationResult } = require("express-validator");
+const validate = {};
 
 /* **********************************
- * Classification Data Validation Rules
+ * W04: Add classification Data Validation Rules - Keep active for W04
  * ********************************* */
 validate.classificationRules = () => {
   return [
+    // classification_name is required and must be alphanumeric
     body("classification_name")
       .trim()
+      .escape()
+      .notEmpty()
+      .isAlphanumeric()
       .isLength({ min: 1 })
-      .withMessage("Please provide a classification name.")
-      .matches(/^[a-zA-Z0-9]+$/)
-      .withMessage("Classification name cannot contain spaces or special characters.")
-      .custom(async (classification_name) => {
-        const classificationExists = await invModel.checkExistingClassification(classification_name)
-        if (classificationExists){
-          throw new Error("Classification already exists. Please use a different name.")
-        }
-      }),
-  ]
-}
+      .withMessage("Please provide a valid classification name."),
+  ];
+};
 
 /* ******************************
- * Check data and return errors or continue to add classification
+ * W04: Check data and return errors or continue for add classification - Keep active for W04
  * ***************************** */
 validate.checkClassificationData = async (req, res, next) => {
-  const { classification_name } = req.body
-  let nav = await utilities.getNav()
-  const errors = validationResult(req)
+  const { classification_name } = req.body;
+  let errors = [];
+  errors = validationResult(req);
   if (!errors.isEmpty()) {
-    res.render("inventory/add-classification", {
+    let nav = await utilities.getNav();
+    res.render("inventory/addClassification", {
       errors,
-      title: "Add New Classification",
+      title: "Add Classification",
       nav,
-      locals: {
-        classification_name: classification_name
-      }
-    })
-    return
+      classification_name,
+    });
+    return;
   }
-  next()
-}
+  next();
+};
 
 /* **********************************
- * Inventory Data Validation Rules
+ * W04: Add inventory Data Validation Rules - Keep active for W04
  * ********************************* */
 validate.inventoryRules = () => {
-    return [
-        body("inv_make")
-            .trim()
-            .isLength({ min: 3 })
-            .withMessage("Please provide a make of at least 3 characters."),
+  return [
+    // Make is required
+    body("inv_make")
+      .trim()
+      .escape()
+      .notEmpty()
+      .isLength({ min: 1 })
+      .withMessage("Please provide a make."),
 
-        body("inv_model")
-            .trim()
-            .isLength({ min: 3 })
-            .withMessage("Please provide a model of at least 3 characters."),
+    // Model is required
+    body("inv_model")
+      .trim()
+      .escape()
+      .notEmpty()
+      .isLength({ min: 1 })
+      .withMessage("Please provide a model."),
 
-        body("inv_year")
-            .trim()
-            .isInt({ min: 1900, max: new Date().getFullYear() + 2 })
-            .withMessage("Please provide a valid 4-digit year (e.g., 2023)."),
+    // Year is required and must be numeric
+    body("inv_year")
+      .trim()
+      .escape()
+      .notEmpty()
+      .withMessage("Year value missing.")
+      .isNumeric()
+      .withMessage("Year must be a number."),
 
-        body("inv_description")
-            .trim()
-            .isLength({ min: 1 })
-            .withMessage("Please provide a description."),
+    // Description is required
+    body("inv_description")
+      .trim()
+      .escape()
+      .notEmpty()
+      .isLength({ min: 1 })
+      .withMessage("Please provide a description."),
 
-        body("inv_image")
-            .trim()
-            .isLength({ min: 1 })
-            .withMessage("Please provide an image path.")
-            .matches(/^\/images\/vehicles\/[^/\\]+\.(png|jpg|jpeg|gif|webp)$/)
-            .withMessage("Image path must be a valid format (e.g., /images/vehicles/imagen.jpg)."),
+    // Image path is required
+    body("inv_image")
+      .trim()
+      .notEmpty() // Removed .escape() as image paths might contain non-alphanumeric chars
+      .isLength({ min: 1 })
+      .withMessage("Please provide an image path."),
 
-        body("inv_thumbnail")
-            .trim()
-            .isLength({ min: 1 })
-            .withMessage("Please provide a thumbnail path.")
-            .matches(/^\/images\/vehicles\/[^/\\]+-tn\.(png|jpg|jpeg|gif|webp)$/)
-            .withMessage("Thumbnail path must be a valid format (e.g., /images/vehicles/imagen-tn.jpg)."),
+    // Thumbnail path is required
+    body("inv_thumbnail")
+      .trim()
+      .notEmpty() // Removed .escape()
+      .isLength({ min: 1 })
+      .withMessage("Please provide a thumbnail path."),
 
-        body("inv_price")
-            .trim()
-            .isFloat({ min: 0 })
-            .withMessage("Please provide a valid price (e.g., 25000.00)."),
+    // Price is required and must be numeric
+    body("inv_price")
+      .trim()
+      .escape()
+      .notEmpty()
+      .withMessage("Price value is missing.")
+      .isNumeric()
+      .withMessage("Price must be a number."),
 
-        body("inv_miles")
-            .trim()
-            .isInt({ min: 0 })
-            .withMessage("Please provide a valid mileage (e.g., 10000)."),
+    // Miles are required and must be numeric
+    body("inv_miles")
+      .trim()
+      .escape()
+      .notEmpty()
+      .withMessage("Miles value is missing.")
+      .isNumeric()
+      .withMessage("Miles must be a number."),
 
-        body("inv_color")
-            .trim()
-            .isLength({ min: 3 })
-            .withMessage("Please provide a color of at least 3 characters."),
+    // Color is required
+    body("inv_color")
+      .trim()
+      .escape()
+      .notEmpty()
+      .isLength({ min: 1 })
+      .withMessage("Please provide a color."),
 
-        body("classification_id")
-            .trim()
-            .isInt({ min: 1 })
-            .withMessage("Please select a classification."),
-    ]
-}
+    // Classification ID is required and must be an integer
+    body("classification_id")
+      .trim()
+      .escape()
+      .notEmpty()
+      .isLength({ min: 1 })
+      .isInt()
+      .withMessage("Please select a classification."),
+  ];
+};
 
 /* ******************************
- * Check data and return errors or continue to add inventory
+ * W04: Check data and return errors or continue for add inventory - Keep active for W04
  * ***************************** */
 validate.checkInventoryData = async (req, res, next) => {
-  const {
-    inv_make, inv_model, inv_year, inv_description, inv_image,
-    inv_thumbnail, inv_price, inv_miles, inv_color, classification_id
-  } = req.body
-  let nav = await utilities.getNav()
-  let classificationList = await utilities.buildClassificationList(Number(classification_id))
-  const errors = validationResult(req)
-  if (!errors.isEmpty()) {
-    res.render("inventory/add-inventory", {
-      errors,
-      title: "Add New Inventory",
-      nav,
-      classificationList,
-      locals: {
-        inv_make,
-        inv_model,
-        inv_year,
-        inv_description,
-        inv_image,
-        inv_thumbnail,
-        inv_price,
-        inv_miles,
-        inv_color,
-        classification_id
-      }
-    })
-    return
-  }
-  next()
-}
+  let errors = [];
+  errors = validationResult(req);
 
-module.exports = validate
+  if (!errors.isEmpty()) {
+    const {
+      inv_make,
+      inv_model,
+      inv_year,
+      inv_description,
+      inv_image,
+      inv_thumbnail,
+      inv_price,
+      inv_miles,
+      inv_color,
+      classification_id,
+    } = req.body;
+    let classifications = await utilities.buildClassificationList(
+      classification_id
+    ); // Assuming this utility is active
+    let nav = await utilities.getNav(); // Assuming this utility is active
+    res.render("inventory/addInventory", {
+      errors,
+      title: "Add Inventory",
+      nav,
+      classifications,
+      inv_make,
+      inv_model,
+      inv_year,
+      inv_description,
+      inv_image,
+      inv_thumbnail,
+      inv_price,
+      inv_miles,
+      inv_color,
+    });
+    return;
+  }
+  next();
+};
+
+
+/* ******************************
+ * W06: Check data and return errors or continue for update inventory - Comment out for W04
+ * ***************************** */
+/*
+validate.checkUpdateData = async (req, res, next) => {
+  let errors = [];
+  errors = validationResult(req);
+
+  if (!errors.isEmpty()) {
+    const {
+      inv_id,
+      inv_make,
+      inv_model,
+      inv_year,
+      inv_description,
+      inv_image,
+      inv_thumbnail,
+      inv_price,
+      inv_miles,
+      inv_color,
+      classification_id,
+    } = req.body;
+    let classifications = await utilities.buildClassificationList(
+      classification_id
+    );
+    let nav = await utilities.getNav();
+    res.render("inventory/editInventory", {
+      errors,
+      title: "Edit " + inv_make + " " + inv_model,
+      nav,
+      classifications,
+      inv_id,
+      inv_make,
+      inv_model,
+      inv_year,
+      inv_description,
+      inv_image,
+      inv_thumbnail,
+      inv_price,
+      inv_miles,
+      inv_color,
+    });
+    return;
+  }
+  next();
+};
+*/
+
+// Export only the needed validation rules and checks
+module.exports = validate;
