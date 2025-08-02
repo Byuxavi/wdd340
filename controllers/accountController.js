@@ -12,9 +12,8 @@ const accountModel = require("../models/account-model");
 
 
 /* ****************************************
- * W05: Deliver registration view - Comment out for W04
+ * W05: Deliver registration view - Keep active for W05
  * *************************************** */
-/*
 async function buildRegister(req, res, next) {
   let nav = await utilities.getNav();
   res.render("account/register", {
@@ -23,12 +22,11 @@ async function buildRegister(req, res, next) {
     errors: null,
   });
 }
-*/
+
 
 /* ****************************************
- * W05: Process Registration - Comment out for W04
+ * W05: Process Registration - Keep active for W05
  * *************************************** */
-/*
 async function registerAccount(req, res) {
   let nav = await utilities.getNav();
   const {
@@ -80,10 +78,10 @@ async function registerAccount(req, res) {
     });
   }
 }
-*/
+
 
 /* ****************************************
- * W04: Deliver login view - Keep active for W04
+ * W04: Deliver login view - Keep active for W05
  * *************************************** */
 async function buildLogin(req, res, next) {
   let nav = await utilities.getNav();
@@ -94,8 +92,9 @@ async function buildLogin(req, res, next) {
   });
 }
 
+
 /* ****************************************
- * W04: Process login post request - Keep active for W04
+ * W04: Process login post request - Keep active for W05
  * ************************************ */
 async function accountLogin(req, res) {
   let nav = await utilities.getNav();
@@ -119,9 +118,9 @@ async function accountLogin(req, res) {
       // We will keep utilities.updateCookie active as it's part of the JWT flow.
       utilities.updateCookie(accountData, res);
 
-      // W05: Redirect to /account/ (management view) - Change for W04 to redirect to home
-      // return res.redirect("/account/"); // Original for W05
-      return res.redirect("/"); // Redirect to home for W04
+      // W05: Redirect to /account/ (management view)
+      // return res.redirect("/"); // Redirect to home for W04
+      return res.redirect("/account/");
     }
     else {
       req.flash("notice", "Please check your credentials and try again.");
@@ -139,11 +138,11 @@ async function accountLogin(req, res) {
   }
 }
 
+
 /* ****************************************
- * W05: Process account management get request - Comment out for W04
+ * W05: Process account management get request - Keep active for W05
  * This function depends on messageModel, which is also W06/W07.
  * ************************************ */
-/*
 async function buildAccountManagementView(req, res) {
   let nav = await utilities.getNav();
   // The following line depends on messageModel, which is commented out for W04.
@@ -157,12 +156,11 @@ async function buildAccountManagementView(req, res) {
   });
   return;
 }
-*/
+
 
 /* ****************************************
- * W05: Process logout request - Comment out for W04
+ * W05: Process logout request - Keep active for W05
  * ************************************ */
-/*
 async function accountLogout(req, res) {
   res.clearCookie("jwt");
   delete res.locals.accountData;
@@ -171,12 +169,11 @@ async function accountLogout(req, res) {
   res.redirect("/");
   return;
 }
-*/
+
 
 /* ****************************************
- * W05: Deliver account update view get - Comment out for W04
+ * W05: Deliver account update view get - Keep active for W05
  * *************************************** */
-/*
 async function buildUpdate(req, res, next) {
   let nav = await utilities.getNav();
 
@@ -192,12 +189,11 @@ async function buildUpdate(req, res, next) {
     account_email
   });
 }
-*/
+
 
 /* ****************************************
- * W05: Process account update post - Comment out for W04
+ * W05: Process account update post - Keep active for W05
  * *************************************** */
-/*
 async function updateAccount(req, res) {
   let nav = await utilities.getNav();
   const {
@@ -207,14 +203,14 @@ async function updateAccount(req, res) {
     account_email,
   } = req.body;
 
-  const regResult = await accountModel.updateAccount(
+  const updateResult = await accountModel.updateAccount(
     account_id,
     account_firstname,
     account_lastname,
     account_email,
   );
 
-  if (regResult) {
+  if (updateResult) {
     req.flash(
       "notice",
       `Congratulations, you've updated ${account_firstname}.`
@@ -243,12 +239,11 @@ async function updateAccount(req, res) {
     });
   }
 }
-*/
+
 
 /* ****************************************
- * W05: Process account password update post - Comment out for W04
+ * W05: Process account password update post - Keep active for W05
  * *************************************** */
-/*
 async function updatePassword(req, res) {
   let nav = await utilities.getNav();
 
@@ -269,9 +264,9 @@ async function updatePassword(req, res) {
     });
   }
 
-  const regResult = await accountModel.updatePassword(account_id, hashedPassword);
+  const updateResult = await accountModel.updatePassword(account_id, hashedPassword);
 
-  if (regResult) {
+  if (updateResult) {
     req.flash(
       "notice",
       `Congratulations, you've updated the password.`
@@ -290,18 +285,16 @@ async function updatePassword(req, res) {
     });
   }
 }
-*/
 
-// Export only the functions needed for W04
+// Export the functions needed for W05
 module.exports = {
   buildLogin,
   accountLogin,
-  // W05 functions commented out for W04:
-  // buildRegister,
-  // registerAccount,
-  // buildAccountManagementView,
-  // accountLogout,
-  // buildUpdate,
-  // updateAccount,
-  // updatePassword
+  buildRegister,
+  registerAccount,
+  buildAccountManagementView,
+  accountLogout,
+  buildUpdate,
+  updateAccount,
+  updatePassword
 };

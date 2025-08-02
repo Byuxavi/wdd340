@@ -19,7 +19,7 @@ const baseController = require("./controllers/baseController");
 const inventoryRoute = require("./routes/inventoryRoute.js");
 
 // W05: Account routes - Commented out for W04
-// const accountRoute = require('./routes/accountRoute.js');
+const accountRoute = require('./routes/accountRoute.js');
 
 // W06/W07: Message routes - Commented out for W04
 // const messageRoute = require('./routes/messageRoute.js');
@@ -79,10 +79,10 @@ app.get("/", utilities.handleErrors(baseController.buildHome));
 // Inventory routes
 app.use("/inv", inventoryRoute);
 
-// W05: Account routes - Commented out for W04
-// app.use("/account", accountRoute);
+// W05: Account routes 
+app.use("/account", accountRoute);
 
-// W06/W07: Message routes - Commented out for W04
+// W06/W07: Message routes 
 // app.use("/message", messageRoute);
 
 // Intentional error route. Used for testing

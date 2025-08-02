@@ -2,10 +2,7 @@
 
 const pool = require("../database/");
 
-/* *****************************
- * W05: Register new account - Comment out for W04
- **************************** */
-/*
+
 async function registerAccount(
   account_firstname,
   account_lastname,
@@ -25,12 +22,8 @@ async function registerAccount(
     return error.message;
   }
 }
-*/
 
-/* **********************
- * W05: Check for existing email - Comment out for W04 (mainly used in registration/update forms)
- ********************* */
-/*
+
 async function checkExistingEmail(account_email, excludedEmail = null) {
   try {
     if(excludedEmail) {
@@ -47,7 +40,6 @@ async function checkExistingEmail(account_email, excludedEmail = null) {
     return error.message;
   }
 }
-*/
 
 /* *****************************
  * W04: Return account data using email address - Keep active for W04 (Login functionality)
@@ -83,10 +75,7 @@ async function getAccountById(account_id) {
   }
 }
 
-/* *****************************
- * W05: Update account details - Comment out for W04
- **************************** */
-/*
+
 async function updateAccount(account_id, account_firstname, account_lastname, account_email) {
   try{
     const sql = "UPDATE account SET account_firstname = $1, account_lastname = $2, account_email = $3 WHERE account_id = $4"
@@ -96,12 +85,7 @@ async function updateAccount(account_id, account_firstname, account_lastname, ac
     return new Error("Update failed");
   }
 }
-*/
 
-/* *****************************
- * W05: Update password - Comment out for W04
- **************************** */
-/*
 async function updatePassword(account_id, hashed_password) {
   try{
     const sql = "UPDATE account SET account_password = $1 WHERE account_id = $2"
@@ -111,7 +95,6 @@ async function updatePassword(account_id, hashed_password) {
     return new Error("Update password failed")
   }
 }
-*/
 
 /* *****************************
  * W06: Get list of all accounts (for message recipient dropdown) - Comment out for W04
@@ -130,10 +113,5 @@ async function getAccountList() {
 }
 */
 
-// Export only the functions needed for W04
-module.exports = { getAccountByEmail, getAccountById };
 
-// Original module.exports (all functions) - commented out for W04
-/*
-module.exports = { registerAccount, checkExistingEmail, getAccountByEmail, getAccountById, updateAccount, updatePassword, getAccountList };
-*/
+module.exports = { registerAccount, checkExistingEmail, getAccountByEmail, getAccountById, updateAccount, updatePassword};

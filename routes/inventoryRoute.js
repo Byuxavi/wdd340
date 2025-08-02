@@ -10,8 +10,8 @@ const invValidate = require("../utilities/inventory-validation");
 /* *******************************************************************
  * WEEK 5: Authentication / Authorization Middleware - Comment out for W04
  ******************************************************************* */
-// router.use(["/add-classification", "/add-inventory", "/edit/:inventoryId", "/update", "/delete/:inventoryId", "/delete/",], utilities.checkLogin);
-// router.use(["/add-classification", "/add-inventory", "/edit/:inventoryId", "/update", "/delete/:inventoryId", "/delete/",], utilities.checkAuthorizationManager);
+ router.use(["/add-classification", "/add-inventory", "/edit/:inventoryId", "/update", "/delete/:inventoryId", "/delete/",], utilities.checkLogin);
+ router.use(["/add-classification", "/add-inventory", "/edit/:inventoryId", "/update", "/delete/:inventoryId", "/delete/",], utilities.checkAuthorizationManager);
 
 /* *******************************************************************
  * WEEK 2 / WEEK 3: Inventory Display Routes - Keep active for W04

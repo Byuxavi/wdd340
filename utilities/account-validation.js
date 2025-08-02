@@ -1,14 +1,14 @@
 // utilities/account-validation.js
 
 const utilities = require("../utilities");
-const accountModel = require("../models/account-model"); // This import remains, but its methods are commented in the model file
+const accountModel = require("../models/account-model");
 const { body, validationResult } = require("express-validator");
 const validate = {};
 
 /* **********************************
- * W05: Registration Data Validation Rules - Comment out for W04
+ * W05: Registration Data Validation Rules - Keep active for W05
  * ********************************* */
-/*
+
 validate.registrationRules = () => {
   return [
     // firstname is required and must be string
@@ -43,12 +43,12 @@ validate.registrationRules = () => {
       }),
   ];
 };
-*/
+
 
 /* **********************************
- * W05: Update Account Data Validation Rules - Comment out for W04
+ * W05: Update Account Data Validation Rules - Keep active for W05
  * ********************************* */
-/*
+
 validate.updateRules = () => {
   return [
     // firstname is required and must be string
@@ -84,12 +84,12 @@ validate.updateRules = () => {
       }),
   ];
 };
-*/
+
 
 /* **********************************
- * W05: Update Password Data Validation Rules - Comment out for W04
+ * W05: Update Password Data Validation Rules - Keep active for W05
  * ********************************* */
-/*
+
 validate.updatePasswordRules = () => {
   return [
     // password is required and must be strong password
@@ -106,10 +106,10 @@ validate.updatePasswordRules = () => {
       .withMessage("Password does not meet requirements."),
   ];
 };
-*/
+
 
 /* **********************************
- * W04: Login Data Validation Rules - Keep active for W04
+ * W04: Login Data Validation Rules - Keep active for W05
  * ********************************* */
 validate.loginRules = () => {
     return [
@@ -137,40 +137,40 @@ validate.loginRules = () => {
 
 
 /* ******************************
- * W05: Check data and return errors or continue to registration - Comment out for W04
+ * W05: Check data and return errors or continue to registration - Keep active for W05
  * ***************************** */
-/*
+
 validate.checkRegData = async (req, res, next) => {
     const { account_firstname, account_lastname, account_email } = req.body;
     let errors = [];
     errors = validationResult(req);
     if (!errors.isEmpty()) {
-        let nav = await utilities.getNav();
-        res.render("account/register", {
-            errors,
-            title: "Registration",
-            nav,
-            account_firstname,
-            account_lastname,
-            account_email,
-        });
-        return;
+      let nav = await utilities.getNav();
+      res.render("account/register", {
+          errors,
+          title: "Registration",
+          nav,
+          account_firstname,
+          account_lastname,
+          account_email,
+      });
+      return;
     }
     next();
 };
-*/
+
 
 /* ******************************
- * W05: Check data and return errors or continue to update - Comment out for W04
+ * W05: Check data and return errors or continue to update - Keep active for W05
  * ***************************** */
-/*
+
 validate.checkUpdateData = async (req, res, next) => {
   const { account_id, account_firstname, account_lastname, account_email } = req.body;
   let errors = [];
   errors = validationResult(req);
   if (!errors.isEmpty()) {
       let nav = await utilities.getNav();
-      res.render("account/update/", {
+      res.render("account/update", {
           errors,
           title: "Update",
           nav,
@@ -183,50 +183,53 @@ validate.checkUpdateData = async (req, res, next) => {
   }
   next();
 };
-*/
+
 
 /* ******************************
- * W05: Check data and return errors or continue to update password - Comment out for W04
+ * W05: Check data and return errors or continue to update password - Keep active for W05
  * ***************************** */
-/*
+
 validate.checkUpdatePasswordData = async (req, res, next) => {
-  const { account_id, account_firstname, account_lastname, account_email } = req.body; // These are not used here, might be from an old copy-paste
+  const { account_id, account_firstname, account_lastname, account_email } = req.body;
   let errors = [];
   errors = validationResult(req);
   if (!errors.isEmpty()) {
       let nav = await utilities.getNav();
-      res.render("account/update", { // Assumes "update" view for password changes
+      res.render("account/update", {
           errors,
           title: "Update",
           nav,
-          // Removed account_id, account_firstname, account_lastname, account_email as they are not typically needed for password update form errors
+          account_id,
+          account_firstname,
+          account_lastname,
+          account_email,
       });
       return;
   }
   next();
 };
-*/
+
 
 
 /* ******************************
- * W04: Check data and return errors or continue to login - Keep active for W04
+ * W04: Check data and return errors or continue to login - Keep active for W05
  * ***************************** */
 validate.checkLoginData = async (req, res, next) => {
     const { account_email } = req.body;
     let errors = [];
     errors = validationResult(req);
     if (!errors.isEmpty()) {
-        let nav = await utilities.getNav();
-        res.render("account/login", {
-            errors,
-            title: "Login",
-            nav,
-            account_email,
-        });
-        return;
+      let nav = await utilities.getNav();
+      res.render("account/login", {
+          errors,
+          title: "Login",
+          nav,
+          account_email,
+      });
+      return;
     }
     next();
 };
 
-// Export only the needed validation rules and checks
+// Export all the validation rules and checks
 module.exports = validate;

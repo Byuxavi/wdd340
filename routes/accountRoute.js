@@ -10,12 +10,12 @@ const regValidate = require("../utilities/account-validation");
 
 
 /* ****************************************
- * W05: Account Management View - Comment out for W04
+ * W05: Account Management View - Keep active for W05
  * *************************************** */
-// router.get("/", utilities.checkLogin, utilities.handleErrors(accountController.buildAccountManagementView));
+router.get("/", utilities.checkLogin, utilities.handleErrors(accountController.buildAccountManagementView));
 
 /* ****************************************
- * W04: Login Routes - Keep active for W04
+ * W04: Login Routes - Keep active for W05
  * *************************************** */
 // Route to build login view
 router.get("/login", utilities.handleErrors(accountController.buildLogin));
@@ -27,37 +27,37 @@ router.post(
 );
 
 /* ****************************************
- * W05: Logout Route - Comment out for W04
+ * W05: Logout Route - Keep active for W05
  * *************************************** */
-// router.get("/logout", utilities.handleErrors(accountController.accountLogout));
+router.get("/logout", utilities.handleErrors(accountController.accountLogout));
 
 /* ****************************************
- * W05: Registration Handlers - Comment out for W04
+ * W05: Registration Handlers - Keep active for W05
  * *************************************** */
-// router.get("/registration", utilities.handleErrors(accountController.buildRegister));
-// router.post(
-//   "/register",
-//   regValidate.registrationRules(),
-//   regValidate.checkRegData,
-//   utilities.handleErrors(accountController.registerAccount)
-// );
+router.get("/registration", utilities.handleErrors(accountController.buildRegister));
+router.post(
+  "/register",
+  regValidate.registrationRules(),
+  regValidate.checkRegData,
+  utilities.handleErrors(accountController.registerAccount)
+);
 
 /* ****************************************
- * W05: Update Account Handlers - Comment out for W04
+ * W05: Update Account Handlers - Keep active for W05
  * *************************************** */
-// router.get("/update/:accountId", utilities.handleErrors(accountController.buildUpdate));
-// router.post(
-//   "/update",
-//   regValidate.updateRules(),
-//   regValidate.checkUpdateData,
-//   utilities.handleErrors(accountController.updateAccount)
-// );
-// router.post(
-//   "/update-password",
-//   regValidate.updatePasswordRules(),
-//   regValidate.checkUpdatePasswordData,
-//   utilities.handleErrors(accountController.updatePassword)
-// );
+router.get("/update/:accountId", utilities.handleErrors(accountController.buildUpdate));
+router.post(
+  "/update",
+  regValidate.updateRules(),
+  regValidate.checkUpdateData,
+  utilities.handleErrors(accountController.updateAccount)
+);
+router.post(
+  "/update-password",
+  regValidate.updatePasswordRules(),
+  regValidate.checkUpdatePasswordData,
+  utilities.handleErrors(accountController.updatePassword)
+);
 
 
 module.exports = router;

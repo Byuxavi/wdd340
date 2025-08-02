@@ -21,7 +21,7 @@ const Util = {};
 
 
 /* ************************
- * W02+: Constructs the nav HTML unordered list - Keep active for W04
+ * W02+: Constructs the nav HTML unordered list - Keep active for W05
  ************************** */
 Util.getNav = async function (req, res, next) {
   let data = await invModel.getClassifications();
@@ -44,7 +44,7 @@ Util.getNav = async function (req, res, next) {
 };
 
 /* **************************************
- * W02+: Build the classification view HTML - Keep active for W04
+ * W02+: Build the classification view HTML - Keep active for W05
  * ************************************ */
 Util.buildClassificationGrid = async function (data) {
   let grid;
@@ -91,17 +91,16 @@ Util.buildClassificationGrid = async function (data) {
     });
     grid += "</ul>";
   } else {
-    grid = '<p class="notice">Sorry, no matching vehicles could be found.</p>'; // Changed from += to = to avoid `undefined`
+    grid = '<p class="notice">Sorry, no matching vehicles could be found.</p>';
   }
   return grid;
 };
 
 /**
- * W03+: Build a single listing element from data - Keep active for W04
+ * W03+: Build a single listing element from data - Keep active for W05
  */
 Util.buildItemListing = async function (data) {
   let listingHTML = "";
-  // console.dir({ data }); // Keep console.dir for debugging if needed, but often removed in production
   if (data) {
     listingHTML = `
       <section class="car-listing">
@@ -135,7 +134,6 @@ Util.buildItemListing = async function (data) {
         </div>
       </section>
     `;
-    // listingHTML += '<img src="/images/notexist.jpg">'; // Introduce 404 error - This line is likely for testing 404s and should be commented/removed.
   } else {
     listingHTML = `
       <p>Sorry, no matching vehicles could be found.</p>
@@ -145,7 +143,7 @@ Util.buildItemListing = async function (data) {
 };
 
 /**
- * W04: Build an HTML select element with classification data - Keep active for W04
+ * W04: Build an HTML select element with classification data - Keep active for W05
  * @param {int} classification_id
  * @returns {string}
  */
@@ -169,7 +167,7 @@ Util.buildClassificationList = async function (classification_id = null) {
 };
 
 /* ****************************************
- * W03+: Middleware For Handling Errors - Keep active for W04
+ * W03+: Middleware For Handling Errors - Keep active for W05
  * Wrap other function in this for
  * General Error Handling
  **************************************** */
@@ -177,7 +175,7 @@ Util.handleErrors = (fn) => (req, res, next) =>
   Promise.resolve(fn(req, res, next)).catch(next);
 
 /* ****************************************
- * W05: Middleware to check JWT token validity - Keep active for W04 (supports checkLogin if used)
+ * W05: Middleware to check JWT token validity - Keep active for W05
  * Sets res.locals.loggedin and res.locals.accountData if a valid token exists.
  **************************************** */
 Util.checkJWTToken = (req, res, next) => {
@@ -202,11 +200,10 @@ Util.checkJWTToken = (req, res, next) => {
 };
 
 /**
- * W05: Function to update the browser cookie (JWT) - Comment out for W04
+ * W05: Function to update the browser cookie (JWT) - Keep active for W05
  * @param {object} accountData
  * @param {import("express").Response} res
  */
-/*
 Util.updateCookie = (accountData, res) => {
   const accessToken = jwt.sign(accountData, process.env.ACCESS_TOKEN_SECRET, {
     expiresIn: 3600,
@@ -221,13 +218,12 @@ Util.updateCookie = (accountData, res) => {
     });
   }
 };
-*/
+
 
 /* ****************************************
- * W05: Check Login Middleware - Comment out for W04 (unless explicitly needed for W04 protected routes)
+ * W05: Check Login Middleware - Keep active for W05
  * Redirects if not logged in.
  * ************************************ */
-/*
 Util.checkLogin = (req, res, next) => {
   if (res.locals.loggedin) {
     next();
@@ -236,13 +232,12 @@ Util.checkLogin = (req, res, next) => {
     return res.redirect("/account/login");
   }
 };
-*/
+
 
 /* ****************************************
- * W05: Check authorization (Manager/Admin) Middleware - Comment out for W04
+ * W05: Check authorization (Manager/Admin) Middleware - Keep active for W05
  * Redirects if not authorized.
  * ************************************ */
-/*
 Util.checkAuthorizationManager = (req, res, next) => {
   if (req.cookies.jwt) {
     jwt.verify(
@@ -270,11 +265,10 @@ Util.checkAuthorizationManager = (req, res, next) => {
     return res.redirect("/account/login");
   }
 };
-*/
 
 
 /**
- * W06: Build an html table string from the message array (Inbox view) - Comment out for W04
+ * W06: Build an html table string from the message array (Inbox view) - Comment out for W05
  * @param {Array<Message>} messages
  * @returns
  */
@@ -312,7 +306,7 @@ Util.buildInbox = (messages) => {
 */
 
 /**
- * W06: Build recipient list for messages - Comment out for W04
+ * W06: Build recipient list for messages - Comment out for W05
  */
 /*
 Util.buildRecipientList = (recipientData, preselected = null) => {
