@@ -1,8 +1,8 @@
-// models/account-model.js
-
 const pool = require("../database/");
 
-
+/* *****************************
+ *   Register new account
+ * *************************** */
 async function registerAccount(
   account_firstname,
   account_lastname,
@@ -23,7 +23,9 @@ async function registerAccount(
   }
 }
 
-
+/* **********************
+ *   Check for existing email
+ * ********************* */
 async function checkExistingEmail(account_email, excludedEmail = null) {
   try {
     if(excludedEmail) {
@@ -32,7 +34,7 @@ async function checkExistingEmail(account_email, excludedEmail = null) {
       return email.rowCount;
     }
     else {
-      const sql = "SELECT * FROM account WHERE account_email = $1";
+      const sql = "SELECT * FROM account WHERE account_email = $1"; 
       const email = await pool.query(sql, [account_email]);
       return email.rowCount;
     }
@@ -42,7 +44,7 @@ async function checkExistingEmail(account_email, excludedEmail = null) {
 }
 
 /* *****************************
- * W04: Return account data using email address - Keep active for W04 (Login functionality)
+ * Return account data using email address
  * ***************************** */
 async function getAccountByEmail(account_email) {
   try {
@@ -52,15 +54,12 @@ async function getAccountByEmail(account_email) {
     );
     return result.rows[0];
   } catch (error) {
-    // Returning a new Error object might be preferable to throwing it here directly
-    // to allow the calling function to handle it gracefully.
-    // For W04, if no account is found, it just means login fails, which is fine.
     return new Error("No matching email found");
   }
 }
 
 /* *****************************
- * W04: Return account data using account id - Keep active for W04 (used by checkLogin middleware)
+ * Return account data using account id
  * ***************************** */
 async function getAccountById(account_id) {
   try {
@@ -70,8 +69,7 @@ async function getAccountById(account_id) {
     );
     return result.rows[0];
   } catch (error) {
-    // Similar to getAccountByEmail, handle error gracefully
-    return new Error("No matching account found by ID");
+    return new Error("No matching email found");
   }
 }
 
@@ -84,8 +82,8 @@ async function updateAccount(account_id, account_firstname, account_lastname, ac
   } catch(error) {
     return new Error("Update failed");
   }
-}
 
+}
 async function updatePassword(account_id, hashed_password) {
   try{
     const sql = "UPDATE account SET account_password = $1 WHERE account_id = $2"
@@ -94,13 +92,9 @@ async function updatePassword(account_id, hashed_password) {
   } catch(error) {
     return new Error("Update password failed")
   }
+
 }
 
-/* *****************************
- * W06: Get list of all accounts (for message recipient dropdown) - Comment out for W04
- * (Although used in messageController, messageController is fully commented out for W04)
- **************************** */
-/*
 async function getAccountList() {
   const sql = "SELECT account_id, account_firstname, account_lastname FROM public.account";
   try {
@@ -111,7 +105,5 @@ async function getAccountList() {
     return new Error("Failed to get account list");
   }
 }
-*/
 
-
-module.exports = { registerAccount, checkExistingEmail, getAccountByEmail, getAccountById, updateAccount, updatePassword};
+module.exports = { registerAccount, checkExistingEmail, getAccountByEmail, getAccountById, updateAccount, updatePassword,getAccountList };

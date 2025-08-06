@@ -17,16 +17,11 @@ const cookieParser = require("cookie-parser");
 const static = require("./routes/static");
 const baseController = require("./controllers/baseController");
 const inventoryRoute = require("./routes/inventoryRoute.js");
-
-// W05: Account routes - Commented out for W04
 const accountRoute = require('./routes/accountRoute.js');
-
-// W06/W07: Message routes - Commented out for W04
-// const messageRoute = require('./routes/messageRoute.js');
-
+const messageRoute = require('./routes/messageRoute.js');
 const intentionalErrorRoute = require("./routes/intentionalErrorRoute.js");
 const utilities = require("./utilities/index.js");
-const pool = require("./database"); // This is used by connect-pg-simple
+const pool = require("./database");
 
 // Init
 const app = express();
@@ -78,13 +73,10 @@ app.use(static);
 app.get("/", utilities.handleErrors(baseController.buildHome));
 // Inventory routes
 app.use("/inv", inventoryRoute);
-
-// W05: Account routes 
+// Account routes
 app.use("/account", accountRoute);
-
-// W06/W07: Message routes 
-// app.use("/message", messageRoute);
-
+// Message routes
+app.use("/message", messageRoute);
 // Intentional error route. Used for testing
 app.use("/ierror", intentionalErrorRoute);
 // File Not Found Route - must be last route in list

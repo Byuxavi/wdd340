@@ -1,27 +1,25 @@
-// utilities/index.js
-
 const invModel = require("../models/inventory-model");
 const jwt = require("jsonwebtoken");
 
-require("dotenv").config(); // Ensure dotenv is loaded for process.env.ACCESS_TOKEN_SECRET
+require("dotenv").config();
 
 const Util = {};
 
 /**
- * @typedef {Object} Message // This JSDoc type definition can remain, it's just documentation.
- * @property {number} message_id
- * @property {string} message_subject
- * @property {string} message_body
- * @property {Date} message_created
- * @property {number} message_to
- * @property {number} message_from
- * @property {boolean} message_read
- * @property {boolean} message_archived
- */
+* @typedef {Object} Message
+* @property {number} message_id
+* @property {string} message_subject
+* @property {string} message_body
+* @property {Date} message_created
+* @property {number} message_to
+* @property {number} message_from
+* @property {boolean} message_read
+* @property {boolean} message_archived
+*/
 
 
 /* ************************
- * W02+: Constructs the nav HTML unordered list - Keep active for W05
+ * Constructs the nav HTML unordered list
  ************************** */
 Util.getNav = async function (req, res, next) {
   let data = await invModel.getClassifications();
@@ -44,7 +42,7 @@ Util.getNav = async function (req, res, next) {
 };
 
 /* **************************************
- * W02+: Build the classification view HTML - Keep active for W05
+ * Build the classification view HTML
  * ************************************ */
 Util.buildClassificationGrid = async function (data) {
   let grid;
@@ -59,7 +57,7 @@ Util.buildClassificationGrid = async function (data) {
         vehicle.inv_make +
         " " +
         vehicle.inv_model +
-        ' details"><img src="' +
+        'details"><img src="' +
         vehicle.inv_thumbnail +
         '" alt="Image of ' +
         vehicle.inv_make +
@@ -91,16 +89,17 @@ Util.buildClassificationGrid = async function (data) {
     });
     grid += "</ul>";
   } else {
-    grid = '<p class="notice">Sorry, no matching vehicles could be found.</p>';
+    grid += '<p class="notice">Sorry, no matching vehicles could be found.</p>';
   }
   return grid;
 };
 
 /**
- * W03+: Build a single listing element from data - Keep active for W05
+ * Build a single listing element from data
  */
 Util.buildItemListing = async function (data) {
   let listingHTML = "";
+  console.dir({ data });
   if (data) {
     listingHTML = `
       <section class="car-listing">
@@ -134,6 +133,7 @@ Util.buildItemListing = async function (data) {
         </div>
       </section>
     `;
+    // listingHTML += '<img src="/images/notexist.jpg">'; // Introduce 404 error
   } else {
     listingHTML = `
       <p>Sorry, no matching vehicles could be found.</p>
@@ -143,10 +143,11 @@ Util.buildItemListing = async function (data) {
 };
 
 /**
- * W04: Build an HTML select element with classification data - Keep active for W05
+ * Build an HTML select element with classification data
  * @param {int} classification_id
  * @returns {string}
  */
+
 Util.buildClassificationList = async function (classification_id = null) {
   let data = await invModel.getClassifications();
   let classificationList =
@@ -167,7 +168,7 @@ Util.buildClassificationList = async function (classification_id = null) {
 };
 
 /* ****************************************
- * W03+: Middleware For Handling Errors - Keep active for W05
+ * Middleware For Handling Errors
  * Wrap other function in this for
  * General Error Handling
  **************************************** */
@@ -175,8 +176,7 @@ Util.handleErrors = (fn) => (req, res, next) =>
   Promise.resolve(fn(req, res, next)).catch(next);
 
 /* ****************************************
- * W05: Middleware to check JWT token validity - Keep active for W05
- * Sets res.locals.loggedin and res.locals.accountData if a valid token exists.
+ * Middleware to check token validity
  **************************************** */
 Util.checkJWTToken = (req, res, next) => {
   if (req.cookies.jwt) {
@@ -185,7 +185,7 @@ Util.checkJWTToken = (req, res, next) => {
       process.env.ACCESS_TOKEN_SECRET,
       function (err, accountData) {
         if (err) {
-          req.flash("notice", "Please log in"); // Added "notice" type for consistency
+          req.flash("Please log in");
           res.clearCookie("jwt");
           return res.redirect("/account/login");
         }
@@ -195,15 +195,16 @@ Util.checkJWTToken = (req, res, next) => {
       }
     );
   } else {
-    next(); // Continue even if no token, allows public pages to load
+    next();
   }
 };
 
 /**
- * W05: Function to update the browser cookie (JWT) - Keep active for W05
+ * Function to update the browser cookie.
  * @param {object} accountData
  * @param {import("express").Response} res
  */
+
 Util.updateCookie = (accountData, res) => {
   const accessToken = jwt.sign(accountData, process.env.ACCESS_TOKEN_SECRET, {
     expiresIn: 3600,
@@ -219,10 +220,8 @@ Util.updateCookie = (accountData, res) => {
   }
 };
 
-
 /* ****************************************
- * W05: Check Login Middleware - Keep active for W05
- * Redirects if not logged in.
+ *  Check Login
  * ************************************ */
 Util.checkLogin = (req, res, next) => {
   if (res.locals.loggedin) {
@@ -233,10 +232,8 @@ Util.checkLogin = (req, res, next) => {
   }
 };
 
-
 /* ****************************************
- * W05: Check authorization (Manager/Admin) Middleware - Keep active for W05
- * Redirects if not authorized.
+ *  Check authorization
  * ************************************ */
 Util.checkAuthorizationManager = (req, res, next) => {
   if (req.cookies.jwt) {
@@ -245,7 +242,7 @@ Util.checkAuthorizationManager = (req, res, next) => {
       process.env.ACCESS_TOKEN_SECRET,
       function (err, accountData) {
         if (err) {
-          req.flash("notice", "Please log in");
+          req.flash("Please log in");
           res.clearCookie("jwt");
           return res.redirect("/account/login");
         }
@@ -268,18 +265,12 @@ Util.checkAuthorizationManager = (req, res, next) => {
 
 
 /**
- * W06: Build an html table string from the message array (Inbox view) - Comment out for W05
- * @param {Array<Message>} messages
- * @returns
+ * Build an html table string from the message array
+ * @param {Array<Message>} messages 
+ * @returns 
  */
-/*
 Util.buildInbox = (messages) => {
-  // Ensure messages is an array, even if empty
-  if (!Array.isArray(messages) || messages.length === 0) {
-    return `<p>No messages found in your inbox.</p>`;
-  }
-
-  let inboxList = `
+  inboxList = `
   <table>
     <thead>
       <tr>
@@ -293,7 +284,7 @@ Util.buildInbox = (messages) => {
     <tr>
       <td>${message.message_created.toLocaleString()}</td>
       <td><a href="/message/view/${message.message_id}">${message.message_subject}</a></td>
-      <td>${message.account_firstname} ${message.account_lastname} (${message.account_type})</td>
+      <td>${message.account_firstname} ${message.account_type}</td>
       <td>${message.message_read ? "✓" : " "}</td>
     </tr>`;
   });
@@ -303,12 +294,7 @@ Util.buildInbox = (messages) => {
   </table> `;
   return inboxList;
 };
-*/
 
-/**
- * W06: Build recipient list for messages - Comment out for W05
- */
-/*
 Util.buildRecipientList = (recipientData, preselected = null) => {
   let list = `<select name="message_to" required>`;
   list += '<option value="">Select a recipient</option>';
@@ -319,7 +305,6 @@ Util.buildRecipientList = (recipientData, preselected = null) => {
   list += "</select>"
 
   return list;
-};
-*/
 
+};
 module.exports = Util;

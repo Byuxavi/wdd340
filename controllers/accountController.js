@@ -1,18 +1,14 @@
-// controllers/accountController.js
-
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 require("dotenv").config();
 
 const utilities = require("../utilities");
 const accountModel = require("../models/account-model");
-
-// W06/W07: Message model - Comment out for W04
-// const messageModel = require("../models/message-model");
+const messageModel = require("../models/message-model");
 
 
 /* ****************************************
- * W05: Deliver registration view - Keep active for W05
+ *  Deliver registration view
  * *************************************** */
 async function buildRegister(req, res, next) {
   let nav = await utilities.getNav();
@@ -23,9 +19,8 @@ async function buildRegister(req, res, next) {
   });
 }
 
-
 /* ****************************************
- * W05: Process Registration - Keep active for W05
+ *  Process Registration
  * *************************************** */
 async function registerAccount(req, res) {
   let nav = await utilities.getNav();
@@ -39,6 +34,7 @@ async function registerAccount(req, res) {
   // Hash the password before storing
   let hashedPassword;
   try {
+    // regular password and cost (salt is generated automatically)
     hashedPassword = await bcrypt.hashSync(account_password, 10);
   } catch (error) {
     req.flash(
@@ -79,12 +75,12 @@ async function registerAccount(req, res) {
   }
 }
 
-
 /* ****************************************
- * W04: Deliver login view - Keep active for W05
+ *  Deliver login view
  * *************************************** */
 async function buildLogin(req, res, next) {
   let nav = await utilities.getNav();
+  // req.flash("notice", "This is a flash message.!!!@2")
   res.render("account/login", {
     title: "Login",
     errors: null,
@@ -92,9 +88,8 @@ async function buildLogin(req, res, next) {
   });
 }
 
-
 /* ****************************************
- * W04: Process login post request - Keep active for W05
+ *  Process login post request
  * ************************************ */
 async function accountLogin(req, res) {
   let nav = await utilities.getNav();
@@ -113,66 +108,54 @@ async function accountLogin(req, res) {
   try {
     if (await bcrypt.compare(account_password, accountData.account_password)) {
       delete accountData.account_password;
-
-      // W05: updateCookie is from W05, but needed for W04 login to set JWT.
-      // We will keep utilities.updateCookie active as it's part of the JWT flow.
+      
       utilities.updateCookie(accountData, res);
-
-      // W05: Redirect to /account/ (management view)
-      // return res.redirect("/"); // Redirect to home for W04
+     
       return res.redirect("/account/");
-    }
+    } // Need to have a wrong password option
     else {
-      req.flash("notice", "Please check your credentials and try again.");
-      res.redirect("/account/login"); // Redirect to login page on bad password
+      req.flash("notice", "Please check your credentials and try again."); // Login was hanging with bad password but correct id
+      res.redirect("/account/");
     }
   } catch (error) {
-    console.error("Login error:", error.message); // Log the actual error
-    req.flash("notice", "An error occurred during login. Please try again.");
-    res.status(500).render("account/login", {
-      title: "Login",
-      nav,
-      errors: null,
-      account_email,
-    });
+    return new Error("Access Forbidden");
   }
 }
 
-
-/* ****************************************
- * W05: Process account management get request - Keep active for W05
- * This function depends on messageModel, which is also W06/W07.
- * ************************************ */
+/**
+ * Process account management get request
+ * @param {import('express').Request} req
+ * @param {import('express').Response} res
+ * @param {import('express').NextFunction} next
+ */
 async function buildAccountManagementView(req, res) {
   let nav = await utilities.getNav();
-  // The following line depends on messageModel, which is commented out for W04.
-  // const unread = await messageModel.getMessageCountById(res.locals.accountData.account_id);
+  const unread = await messageModel.getMessageCountById(res.locals.accountData.account_id);
 
   res.render("account/account-management", {
     title: "Account Management",
     nav,
     errors: null,
-    // unread, // Commented out as messageModel is not active
+    unread, 
   });
-  return;
+  return; 
 }
 
-
 /* ****************************************
- * W05: Process logout request - Keep active for W05
+ *  Process logout request
  * ************************************ */
 async function accountLogout(req, res) {
-  res.clearCookie("jwt");
+  res.clearCookie("jwt")
   delete res.locals.accountData;
   res.locals.loggedin = 0;
-  req.flash("notice", "Logout successful.");
+  req.flash("notice", "Logout successful.")
   res.redirect("/");
-  return;
+  return; 
+
 }
 
-
 /* ****************************************
- * W05: Deliver account update view get - Keep active for W05
+ *  Deliver account update view get
  * *************************************** */
 async function buildUpdate(req, res, next) {
   let nav = await utilities.getNav();
@@ -190,9 +173,8 @@ async function buildUpdate(req, res, next) {
   });
 }
 
-
 /* ****************************************
- * W05: Process account update post - Keep active for W05
+ *  Process account update post
  * *************************************** */
 async function updateAccount(req, res) {
   let nav = await utilities.getNav();
@@ -201,25 +183,29 @@ async function updateAccount(req, res) {
     account_firstname,
     account_lastname,
     account_email,
+    // account_password,
   } = req.body;
 
-  const updateResult = await accountModel.updateAccount(
+  const regResult = await accountModel.updateAccount(
     account_id,
     account_firstname,
     account_lastname,
     account_email,
   );
 
-  if (updateResult) {
+  if (regResult) {
     req.flash(
       "notice",
       `Congratulations, you've updated ${account_firstname}.`
     );
 
-    const accountData = await accountModel.getAccountById(account_id);
+    //Update the cookie accountData
+    // TODO: Better way to do this?
+
+    const accountData = await accountModel.getAccountById(account_id); // Get it from db so we can remake the cookie
     delete accountData.account_password;
-    res.locals.accountData.account_firstname = accountData.account_firstname;
-    utilities.updateCookie(accountData, res);
+    res.locals.accountData.account_firstname = accountData.account_firstname; // So it displays correctly
+    utilities.updateCookie(accountData, res); // Remake the cookie with new data
 
     res.status(201).render("account/account-management", {
       title: "Management",
@@ -242,15 +228,17 @@ async function updateAccount(req, res) {
 
 
 /* ****************************************
- * W05: Process account password update post - Keep active for W05
+ *  Process account password update post
  * *************************************** */
 async function updatePassword(req, res) {
   let nav = await utilities.getNav();
 
   const { account_id, account_password } = req.body;
 
+  // Hash the password before storing.
   let hashedPassword;
   try {
+    // regular password and cost (salt is generated automatically)
     hashedPassword = await bcrypt.hashSync(account_password, 10);
   } catch (error) {
     req.flash(
@@ -264,9 +252,9 @@ async function updatePassword(req, res) {
     });
   }
 
-  const updateResult = await accountModel.updatePassword(account_id, hashedPassword);
+  const regResult = await accountModel.updatePassword(account_id, hashedPassword);
 
-  if (updateResult) {
+  if (regResult) {
     req.flash(
       "notice",
       `Congratulations, you've updated the password.`
@@ -286,15 +274,14 @@ async function updatePassword(req, res) {
   }
 }
 
-// Export the functions needed for W05
-module.exports = {
-  buildLogin,
-  accountLogin,
-  buildRegister,
-  registerAccount,
-  buildAccountManagementView,
-  accountLogout,
-  buildUpdate,
-  updateAccount,
-  updatePassword
-};
+
+module.exports = { 
+  buildLogin, 
+  buildRegister, 
+  registerAccount, 
+  accountLogin, 
+  buildAccountManagementView, 
+  accountLogout, 
+  buildUpdate, 
+  updateAccount, 
+  updatePassword };

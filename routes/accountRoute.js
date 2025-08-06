@@ -1,5 +1,3 @@
-// routes/accountRoute.js
-
 // Needed Resources
 const express = require("express");
 const router = new express.Router();
@@ -9,15 +7,9 @@ const utilities = require("../utilities");
 const regValidate = require("../utilities/account-validation");
 
 
-/* ****************************************
- * W05: Account Management View - Keep active for W05
- * *************************************** */
 router.get("/", utilities.checkLogin, utilities.handleErrors(accountController.buildAccountManagementView));
 
-/* ****************************************
- * W04: Login Routes - Keep active for W05
- * *************************************** */
-// Route to build login view
+// Route to build account view
 router.get("/login", utilities.handleErrors(accountController.buildLogin));
 router.post(
   "/login",
@@ -26,14 +18,10 @@ router.post(
   utilities.handleErrors(accountController.accountLogin)
 );
 
-/* ****************************************
- * W05: Logout Route - Keep active for W05
- * *************************************** */
+// Route to logout
 router.get("/logout", utilities.handleErrors(accountController.accountLogout));
 
-/* ****************************************
- * W05: Registration Handlers - Keep active for W05
- * *************************************** */
+// Registration handlers
 router.get("/registration", utilities.handleErrors(accountController.buildRegister));
 router.post(
   "/register",
@@ -42,16 +30,14 @@ router.post(
   utilities.handleErrors(accountController.registerAccount)
 );
 
-/* ****************************************
- * W05: Update Account Handlers - Keep active for W05
- * *************************************** */
+// Update account handlers
 router.get("/update/:accountId", utilities.handleErrors(accountController.buildUpdate));
 router.post(
   "/update",
-  regValidate.updateRules(),
+  regValidate.updateRules(), // TODO: This needs to have a separate rule set, without existing email check..unless...oh complex
   regValidate.checkUpdateData,
   utilities.handleErrors(accountController.updateAccount)
-);
+  );
 router.post(
   "/update-password",
   regValidate.updatePasswordRules(),
